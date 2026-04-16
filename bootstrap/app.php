@@ -9,11 +9,6 @@ return Application::configure(basePath: dirname(__DIR__))
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
-        then: function () {
-            Route::middleware('web')
-                ->prefix('web') // اختياري: لإضافة سابقة للرابط مثل localhost/admin/users
-                ->group(base_path('routes/custom.php'));
-        },
     )
     ->withMiddleware(function (Middleware $middleware) {
         // تسجيل الـ Aliases الخاصة بمكتبة mcamara
