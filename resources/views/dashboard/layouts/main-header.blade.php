@@ -1,4 +1,13 @@
 <!-- main-header opened -->
+|@section('css')
+
+	@if (App::getLocale() == 'ar')
+   		 <link href="{{ URL::asset('dashboard/css/rtl/style.css') }}" rel="stylesheet">
+	@else
+   		 <link href="{{ URL::asset('dashboard/css/ltr/style.css') }}" rel="stylesheet">
+	@endif
+
+@endsection
 <div class="main-header nav nav-item hor-header">
 	<div class="container">
 		<div class="main-header-left ">
@@ -14,49 +23,14 @@
 			</div>
 		</div><!-- search -->
 		<div class="main-header-right">
-			<ul class="nav">
-				<li class="">
-					<div class="dropdown  nav-itemd-none d-md-flex">
-						<a href="#" class="d-flex  nav-item nav-link pr-0 country-flag1" data-toggle="dropdown" aria-expanded="false">
-							<span class="avatar country-Flag mr-0 align-self-center bg-transparent"><img src="{{URL::asset('assets/img/flags/us_flag.jpg')}}" alt="img"></span>
-							<div class="my-auto">
-								<strong class="mr-2 ml-2 my-auto">English</strong>
-							</div>
+			<ul>
+				@foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+					<li>
+						<a rel="alternate" hreflang="{{ $localeCode }}" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+							{{ $properties['native'] }}
 						</a>
-						<div class="dropdown-menu dropdown-menu-left dropdown-menu-arrow" x-placement="bottom-end">
-							<a href="#" class="dropdown-item d-flex ">
-								<span class="avatar  mr-3 align-self-center bg-transparent"><img src="{{URL::asset('assets/img/flags/french_flag.jpg')}}" alt="img"></span>
-								<div class="d-flex">
-									<span class="mt-2">French</span>
-								</div>
-							</a>
-							<a href="#" class="dropdown-item d-flex">
-								<span class="avatar  mr-3 align-self-center bg-transparent"><img src="{{URL::asset('assets/img/flags/germany_flag.jpg')}}" alt="img"></span>
-								<div class="d-flex">
-									<span class="mt-2">Germany</span>
-								</div>
-							</a>
-							<a href="#" class="dropdown-item d-flex">
-								<span class="avatar mr-3 align-self-center bg-transparent"><img src="{{URL::asset('assets/img/flags/italy_flag.jpg')}}" alt="img"></span>
-								<div class="d-flex">
-									<span class="mt-2">Italy</span>
-								</div>
-							</a>
-							<a href="#" class="dropdown-item d-flex">
-								<span class="avatar mr-3 align-self-center bg-transparent"><img src="{{URL::asset('assets/img/flags/russia_flag.jpg')}}" alt="img"></span>
-								<div class="d-flex">
-									<span class="mt-2">Russia</span>
-								</div>
-							</a>
-							<a href="#" class="dropdown-item d-flex">
-								<span class="avatar  mr-3 align-self-center bg-transparent"><img src="{{URL::asset('assets/img/flags/spain_flag.jpg')}}" alt="img"></span>
-								<div class="d-flex">
-									<span class="mt-2">spain</span>
-								</div>
-							</a>
-						</div>
-					</div>
-				</li>
+					</li>
+				@endforeach
 			</ul>
 			<div class="nav nav-item  navbar-nav-right ml-auto">
 				<div class="nav-link" id="bs-example-navbar-collapse-1">
