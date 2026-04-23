@@ -43,8 +43,8 @@ class SectionController extends Controller
     }
 
    
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        return $this->section->destroy($section);
+        return $this->section->destroy($request);
     }
 }

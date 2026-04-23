@@ -18,6 +18,9 @@ class DatabaseSeeder extends Seeder
         $this->call([
             UserTableSeeder::class,
             AdminTableSeeder::class,
+            SectionSeeder::class,
+            DoctorSeedTable::class,
+            ImageSeedTable::class,
         ]);
     }
 }

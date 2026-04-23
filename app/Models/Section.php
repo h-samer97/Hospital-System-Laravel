@@ -10,4 +10,6 @@ class Section extends Model
     protected $guarded = [];
 
     use HasFactory;
+
+
 }

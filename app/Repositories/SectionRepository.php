@@ -5,18 +5,6 @@ namespace App\Repositories;
 use App\Interfaces\ISections;
 use App\Models\Section;
 
-/**
- * The TypeError occurred because the SectionController is type-hinting 'App\Http\Interfaces\ISections'
- * while this Repository implements 'App\Interfaces\ISections'. Ensure that the Interface file
- * namespace and the Controller import both match 'App\Interfaces\ISections'.
- */
-
-namespace App\Repositories;
-
-
-use App\Interfaces\ISections;
-use App\Models\Section;
-
 class SectionRepository implements ISections
 {
     public function index()
@@ -27,7 +15,7 @@ class SectionRepository implements ISections
 
     public function create()
     {
-        
+        return view('sections.add');
     }
 
     public function store($request)
@@ -43,7 +31,8 @@ class SectionRepository implements ISections
 
     public function edit($id)
     {
-        //
+        $sections = Section::findOrFail($id);
+        return view('sections.edit', compact('sections'));
     }
 
     public function update($request)
@@ -55,9 +44,9 @@ class SectionRepository implements ISections
         return redirect()->route('sections.index')->with('success', 'Section updated successfully');
     }
 
-    public function destroy($id)
+    public function destroy($request)
     {
-        $section = Section::findOrFail($id);
+        $section = Section::findOrFail($request->id);
         $section->delete();
         return redirect()->route('sections.index')->with('success', 'Section deleted successfully');
     }

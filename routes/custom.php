@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\dashboard\DoctorController;
 use App\Http\Controllers\Auth\AdminController;
 use App\Http\Controllers\SectionController;
 use Illuminate\Support\Facades\Route;
@@ -17,5 +18,12 @@ Route::post('/login/admin', [AdminController::class, 'login'])->name('login.admi
 
 Route::post('/logout/admin', [AdminController::class, 'logout'])->name('logout.admin');
 
-// Sections Resource
-Route::resource('sections', SectionController::class);
+Route::middleware(['auth:admin'])->group(function () {
+
+    # Sections Resource
+    Route::resource('sections', SectionController::class);
+
+    # Doctors Resource
+    Route::resource('doctors', DoctorController::class);
+
+});
