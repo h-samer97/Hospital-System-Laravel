@@ -17,11 +17,11 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('name');
-            $table->string('specialization');
             $table->string('phone');
-            $table->decimal('price',8,2);
+            $table->decimal('price', 8, 2);
             $table->string('image')->nullable();
             $table->string('appointments');
+            $table->boolean('status')->default(1);
             $table->foreignId('section_id')->references('id')->on('sections')->onDelete('cascade');
             $table->timestamps();
         });
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('doctors');
     }
 };

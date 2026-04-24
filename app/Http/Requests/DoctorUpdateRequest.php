@@ -21,9 +21,10 @@ class DoctorUpdateRequest extends FormRequest
             'email' => ['sometimes', 'required', 'email', Rule::unique('doctors', 'email')->ignore($this->route('doctor'))],
             'password' => 'sometimes|required|string|min:8',
             'phone' => 'sometimes|required|string|max:20',
-            'specialization' => 'sometimes|required|string|max:255',
+            'appointments' => 'required|array',
             'price' => 'sometimes|required|numeric|min:0',
             'section_id' => 'sometimes|required|exists:sections,id',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Add validation for photo
         ];
     }
 }

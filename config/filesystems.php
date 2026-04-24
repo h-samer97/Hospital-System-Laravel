@@ -38,6 +38,13 @@ return [
             'report' => false,
         ],
 
+        'images' => [
+            'driver' => 'local',
+            'root' => public_path('images'),
+            'visibility' => 'public',
+            'url' => env('APP_URL').'/images',
+        ],
+
         'public' => [
             'driver' => 'local',
             'root' => storage_path('app/public'),

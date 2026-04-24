@@ -11,10 +11,10 @@ use App\Models\Section;
 
 class DoctorController extends Controller
 {
-
     private IDoctor $doctor;
 
-    public function __construct(IDoctor $doctor) {
+    public function __construct(IDoctor $doctor)
+    {
 
         $this->doctor = $doctor;
 
@@ -44,6 +44,7 @@ class DoctorController extends Controller
     {
         $doctor = Doctor::findOrFail($id);
         $sections = Section::all();
+
         return view('doctors.edit', compact('doctor', 'sections'));
     }
 

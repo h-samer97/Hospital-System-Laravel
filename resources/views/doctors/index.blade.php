@@ -28,6 +28,7 @@
     <!-- breadcrumb -->
 @endsection
 @section('content')
+    @include('dashboard.messages_alert')
     <!-- row opened -->
     <div class="row row-sm">
         <!--div-->

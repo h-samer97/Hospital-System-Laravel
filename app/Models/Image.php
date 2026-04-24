@@ -9,11 +9,16 @@ class Image extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'filename',
+        'imageable_id',
+        'imageable_type',
+    ];
 
-    # Image belongs to a doctor or a section or a patient or a nurse or an admin
+    // Image belongs to a doctor or a section or a patient or a nurse or an admin
 
-    public function imageable(){
+    public function imageable()
+    {
         return $this->morphTo();
     }
 }

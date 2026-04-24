@@ -1,4 +1,4 @@
-@extends('Dashboard.layouts.master')
+@extends('dashboard.layouts.master')
 @section('css')
     <!--Internal Sumoselect css-->
     <link rel="stylesheet" href="{{ URL::asset('Dashboard/plugins/sumoselect/sumoselect-rtl.css') }}">
@@ -22,8 +22,7 @@
     <!-- breadcrumb -->
 @endsection
 @section('content')
-
-    @include('Dashboard.messages_alert')
+    @include('dashboard.messages_alert')
 
     <!-- row -->
     <div class="row">
