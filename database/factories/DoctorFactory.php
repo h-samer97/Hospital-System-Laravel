@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Section;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -18,10 +19,9 @@ class DoctorFactory extends Factory
             'email_verified_at' => now(),
             'password' => bcrypt('password'),
             'phone' => $this->faker->phoneNumber(),
-            // 'specialization' => $this->faker->randomElement(['Cardiology', 'Dermatology', 'Neurology', 'Pediatrics', 'Psychiatry']),
             'price' => $this->faker->randomFloat(2, 0, 50),
             'section_id' => Section::inRandomOrder()->first()->id,
-            'appointments' => implode(',', $this->faker->randomElements(['sat', 'sun', 'mon'], 2)),
+            'appointments' => Appointment::all()->random()->id,
             'status' => 1,
         ];
     }

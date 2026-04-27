@@ -2,7 +2,10 @@
 
 namespace App\Traits;
 
+use App\Models\Image;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 trait UploadImage
 {
@@ -31,11 +34,11 @@ trait UploadImage
 
     }
 
-    public function deleteImage($imageableId, $imageableType)
+    public function deleteImage($imageableId, $imageableType, $folderName, $disk)
     {
         $image = Image::where('imageable_id', $imageableId)->where('imageable_type', $imageableType)->first();
         if ($image) {
-            Storage::disk('images')->delete('doctors/'.$image->filename); // Assuming folder is 'doctors'
+            Storage::disk($disk)->delete($folderName.'/'.$image->filename);
             $image->delete();
         }
     }

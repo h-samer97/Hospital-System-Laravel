@@ -1,7 +1,7 @@
 @extends('dashboard.layouts.master')
 @section('css')
     <!--Internal Sumoselect css-->
-    <link rel="stylesheet" href="{{ URL::asset('Dashboard/plugins/sumoselect/sumoselect-rtl.css') }}">
+    <link rel="stylesheet" href="{{ URL::asset('dashboard/plugins/sumoselect/sumoselect-rtl.css') }}">
     <link href="{{URL::asset('dashboard/plugins/notify/css/notifIt.css')}}" rel="stylesheet"/>
 
 @section('title')
@@ -100,13 +100,9 @@
                                 <div class="col-md-11 mg-t-5 mg-md-t-0">
                                     <select multiple="multiple" class="testselect2" name="appointments[]">
                                         <option selected value="" selected disabled>-- حدد المواعيد --</option>
-                                        <option value="السبت">السبت</option>
-                                        <option value="الأحد">الأحد</option>
-                                        <option value="الأثنين">الأثنين</option>
-                                        <option value="الثلاثاء">الثلاثاء</option>
-                                        <option value="الأربعاء">الأربعاء</option>
-                                        <option value="الخميس">الخميس</option>
-                                        <option value="الجمعة">الجمعة</option>
+                                        @foreach($appointments as $appointment)
+                                            <option value="{{$appointment->id}}">{{$appointment->name}}</option>
+                                        @endforeach
                                     </select>
 
                                 </div>
@@ -156,22 +152,12 @@
 @endsection
 @section('js')
 
-    <script>
-        var loadFile = function(event) {
-            var output = document.getElementById('output');
-            output.src = URL.createObjectURL(event.target.files[0]);
-            output.onload = function() {
-                URL.revokeObjectURL(output.src) // free memory
-            }
-        };
-    </script>
-
     <!--Internal  Form-elements js-->
-    <script src="{{ URL::asset('Dashboard/js/select2.js') }}"></script>
-    <script src="{{ URL::asset('Dashboard/js/advanced-form-elements.js') }}"></script>
+    <script src="{{ URL::asset('dashboard/js/select2.js') }}"></script>
+    <script src="{{ URL::asset('dashboard/js/advanced-form-elements.js') }}"></script>
 
     <!--Internal Sumoselect js-->
-    <script src="{{ URL::asset('Dashboard/plugins/sumoselect/jquery.sumoselect.js') }}"></script>
+    <script src="{{ URL::asset('dashboard/plugins/sumoselect/jquery.sumoselect.js') }}"></script>
     <!--Internal  Notify js -->
     <script src="{{URL::asset('dashboard/plugins/notify/js/notifIt.js')}}"></script>
     <script src="{{URL::asset('/plugins/notify/js/notifit-custom.js')}}"></script>

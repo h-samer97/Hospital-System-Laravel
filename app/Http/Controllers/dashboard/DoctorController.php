@@ -8,6 +8,7 @@ use App\Http\Requests\DoctorUpdateRequest;
 use App\Interfaces\IDoctor;
 use App\Models\Doctor;
 use App\Models\Section;
+use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
@@ -53,8 +54,8 @@ class DoctorController extends Controller
         return $this->doctor->update($request, $id);
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        return $this->doctor->destroy($id);
+        return $this->doctor->destroy($request);
     }
 }

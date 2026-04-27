@@ -1,7 +1,7 @@
-@extends('Dashboard.layouts.master')
+@extends('dashboard.layouts.master')
 @section('css')
     <!--Internal Sumoselect css-->
-    <link rel="stylesheet" href="{{ URL::asset('Dashboard/plugins/sumoselect/sumoselect-rtl.css') }}">
+    <link rel="stylesheet" href="{{ URL::asset('dashboard/plugins/sumoselect/sumoselect-rtl.css') }}">
     <link href="{{URL::asset('dashboard/plugins/notify/css/notifIt.css')}}" rel="stylesheet"/>
 @section('title')
     {{ trans('doctors.edit_doctor') }}
@@ -22,7 +22,7 @@
 @endsection
 @section('content')
 
-@include('Dashboard.messages_alert')
+@include('dashboard.messages_alert')
 
 <!-- row -->
 <div class="row">

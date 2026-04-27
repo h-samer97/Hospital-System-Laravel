@@ -7,6 +7,7 @@ use App\Models\Doctor;
 use App\Models\Section;
 use App\Traits\UploadImage;
 use Illuminate\Support\Facades\DB;
+use App\Models\Appointment;
 
 class DoctorRepository implements IDoctor
 {
@@ -22,8 +23,9 @@ class DoctorRepository implements IDoctor
     public function create()
     {
         $sections = Section::all();
+        $appointments = Appointment::all();
 
-        return view('doctors.add', compact('sections'));
+        return view('doctors.add', compact('sections', 'appointments'));
     }
 
     public function store($request)
@@ -71,7 +73,7 @@ class DoctorRepository implements IDoctor
 
             if ($request->hasFile('photo')) {
                 // Delete old image if exists
-                $this->deleteImage($doctor->id, Doctor::class);
+                $this->deleteImage($doctor->id, Doctor::class, 'doctors', 'images');
                 // Upload new image
                 $this->uploadImage($request, 'photo', 'doctors', 'images', $doctor->id, Doctor::class);
             }
@@ -88,13 +90,16 @@ class DoctorRepository implements IDoctor
         }
     }
 
-    public function destroy($id)
+    public function destroy($request)
     {
         try {
-            $doctor = Doctor::findOrFail($id);
-            // Delete associated image
-            $this->deleteImage($doctor->id, Doctor::class);
-            $doctor->delete();
+            $doctorsId = explode(',', $request->delete_select_id);
+
+            foreach ($doctorsId as $id) {
+                $doctor = Doctor::findOrFail($id);
+                $this->deleteImage($doctor->id, Doctor::class, 'doctors', 'images');
+                $doctor->delete();
+            }
 
             return redirect()->route('doctors.index')->with('success', 'Doctor deleted successfully.');
         } catch (\Exception $e) {
