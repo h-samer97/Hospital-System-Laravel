@@ -1,8 +1,13 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+use App\Providers\DoctorProvider;
+use App\Providers\SectionProvider;
+use App\Providers\SingleServicesProvider;
+
 return [
-    App\Providers\AppServiceProvider::class,
-    App\Providers\DoctorProvider::class,
-    App\Providers\SectionProvider::class,
-    App\Providers\DoctorProvider::class,
+    AppServiceProvider::class,
+    DoctorProvider::class,
+    SectionProvider::class,
+    SingleServicesProvider::class,
 ];

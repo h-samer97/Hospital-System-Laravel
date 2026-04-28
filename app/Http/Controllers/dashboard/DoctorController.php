@@ -38,7 +38,7 @@ class DoctorController extends Controller
 
     public function show($id)
     {
-        //
+        return $this->doctor->show($id);
     }
 
     public function edit($id)
@@ -57,5 +57,15 @@ class DoctorController extends Controller
     public function destroy(Request $request)
     {
         return $this->doctor->destroy($request);
+    }
+
+    public function update_password(Request $request)
+    {
+        return $this->doctor->update_password($request);
+    }
+
+    public function update_status($id)
+    {
+        return $this->doctor->update_status($id);
     }
 }

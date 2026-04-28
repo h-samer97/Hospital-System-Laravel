@@ -1,14 +1,24 @@
 <?php
 
+namespace App\Interfaces;
 
-    namespace App\Interfaces;
-
-interface IDoctor {
-
+interface IDoctor
+{
     public function index();
-    public function create();
-    public function store($request);
-    public function update($request, $id);
-    public function destroy($id);
 
+    public function update_password($request);
+
+    public function update_status($id);
+
+    public function create();
+
+    public function show($id);
+
+    public function edit($id);
+
+    public function store($request);
+
+    public function update($request, $id);
+
+    public function destroy($id);
 }

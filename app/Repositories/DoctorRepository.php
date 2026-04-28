@@ -3,11 +3,11 @@
 namespace App\Repositories;
 
 use App\Interfaces\IDoctor;
+use App\Models\Appointment;
 use App\Models\Doctor;
 use App\Models\Section;
 use App\Traits\UploadImage;
 use Illuminate\Support\Facades\DB;
-use App\Models\Appointment;
 
 class DoctorRepository implements IDoctor
 {
@@ -105,5 +105,41 @@ class DoctorRepository implements IDoctor
         } catch (\Exception $e) {
             return redirect()->route('doctors.index')->with('error', 'Failed to delete doctor.');
         }
+    }
+
+    public function update_password($request)
+    {
+        $doctor = Doctor::findOrfail($request->id);
+        $doctor->password = bcrypt($request->password);
+        $doctor->save();
+        flash()->success('Password updated successfully.');
+
+        return redirect()->route('doctors.index')->with('success', 'Password updated successfully.');
+    }
+
+    public function update_status($id)
+    {
+        $doctor = Doctor::findOrFail($id);
+        $doctor->status = ! $doctor->status;
+        $doctor->save();
+        flash()->success('Status updated successfully.');
+
+        return redirect()->route('doctors.index')->with('success', 'Status updated successfully.');
+    }
+
+    public function show($id)
+    {
+        $doctors = Section::findOrFail($id)->doctors;
+        $section = Section::findOrFail($id);
+
+        return view('dashboard.Sections.show_doctors', compact('doctors', 'section'));
+    }
+
+    public function edit($id)
+    {
+        $doctor = Doctor::findOrFail($id);
+        $sections = Section::all();
+
+        return view('doctors.edit', compact('doctor', 'sections'));
     }
 }

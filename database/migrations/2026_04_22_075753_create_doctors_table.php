@@ -21,6 +21,7 @@ return new class extends Migration
             $table->decimal('price', 8, 2);
             $table->string('image')->nullable();
             $table->boolean('status')->default(1);
+            $table->string('doctorappointments')->nullable();
             $table->foreignId('section_id')->references('id')->on('sections')->onDelete('cascade');
             $table->timestamps();
         });
