@@ -34,5 +34,8 @@ Route::middleware(['auth:admin'])->group(function () {
     // Single Services
 
     Route::resource('single_services', SingleServicesController::class)->names('SingleService');
+    Route::view('Add_GroupServices','livewire.include_create')->name('Add_GroupServices');
+
+
 
 });

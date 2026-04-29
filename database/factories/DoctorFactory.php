@@ -21,8 +21,9 @@ class DoctorFactory extends Factory
             'phone' => $this->faker->phoneNumber(),
             'price' => $this->faker->randomFloat(2, 0, 50),
             'section_id' => Section::inRandomOrder()->first()->id,
-            'appointments' => Appointment::all()->random()->id,
+            'doctorappointments' => Appointment::all()->random()->id,
             'status' => 1,
+            'image' => $this->faker->imageUrl(640, 480, 'doctors', true),
         ];
     }
 }

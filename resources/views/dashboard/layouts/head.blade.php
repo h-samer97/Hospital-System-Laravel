@@ -16,3 +16,4 @@
 <link href="{{URL::asset('assets/css/skin-modes.css')}}" rel="stylesheet" />
 <!--- Animations css-->
 <link href="{{URL::asset('assets/css/animate.css')}}" rel="stylesheet">
+@livewireStyles
