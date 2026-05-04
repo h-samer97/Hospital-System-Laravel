@@ -27,7 +27,9 @@
 				@yield('content')
 				@include('dashboard.layouts.sidebar-right')
 				@include('dashboard.layouts.models')
-            	@include('dashboard.layouts.footer')
-				@include('dashboard.layouts.footer-scripts')	
-	</body>
+                @include('dashboard.layouts.footer')
+            </div>
+        </div>
+        @include('dashboard.layouts.footer-scripts')
+    </body>
 </html>

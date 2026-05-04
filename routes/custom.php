@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Auth\AdminController;
+use App\Http\Controllers\dashboard\AmbulanceController;
 use App\Http\Controllers\dashboard\DoctorController;
+use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SingleServicesController;
 use Illuminate\Support\Facades\Route;
@@ -34,8 +36,14 @@ Route::middleware(['auth:admin'])->group(function () {
     // Single Services
 
     Route::resource('single_services', SingleServicesController::class)->names('SingleService');
-    Route::view('Add_GroupServices','livewire.include_create')->name('Add_GroupServices');
+    Route::view('Add_GroupServices', 'livewire.include_create')->name('Add_GroupServices');
 
+    Route::resource('insurance', InsuranceController::class);
 
+    Route::resource('ambulance', AmbulanceController::class);
+
+    Route::resource('patients', PatientController::class);
+
+    Route::view('single_invoices', 'livewire.SingleInvoices.index')->name('single_invoices');
 
 });

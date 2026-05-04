@@ -115,7 +115,20 @@ $(function() {
 	});
 	
 	
-	
+    document.addEventListener("livewire:load", function () {
+        Livewire.hook('message.processed', (message, component) => {
+            // إذا كنت تستخدم مكتبة سكرول معينة، أعد تعريفها هنا
+            // مثال: $('.side-menu').niceScroll();
+            
+            // أو الحل العام لإعادة تفعيل السكرول الطبيعي
+            $('body').css('overflow', 'auto');
+        });
+    });
+
+	document.addEventListener('livewire:navigated', () => { 
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
 	/* ----------------------------------- */
 	
 	// Showing submenu in navbar while hiding previous open submenu

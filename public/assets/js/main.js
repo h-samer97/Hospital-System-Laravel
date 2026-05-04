@@ -67,7 +67,7 @@ function getCheckedDoctorIds() {
         new bootstrap.Modal(document.getElementById('delete_select')).show();
         document.getElementById('delete_select_id').value = doctorIds.join(',');
     } else {
-        alert('يرجى اختيار طبيب واحد على الأقل للحذف.');
+        console.log('يرجى اختيار طبيب واحد على الأقل للحذف.');
     }
 
     return doctorIds;
