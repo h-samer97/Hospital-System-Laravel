@@ -8,12 +8,12 @@ class PatientRepository implements IPatient
 {
     public function index()
     {
-        return view('patients.index');
+        return inertia('patients/PatientList');
     }
 
     public function create()
     {
-        return view('patients.create');
+        return inertia('patients/PatientForm');
     }
 
     public function store($request)
@@ -25,7 +25,7 @@ class PatientRepository implements IPatient
 
     public function edit($id)
     {
-        return view('patients.edit');
+        return inertia('patients/PatientForm', ['id' => $id]);
     }
 
     public function update($request)

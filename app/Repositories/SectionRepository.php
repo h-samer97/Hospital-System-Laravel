@@ -10,12 +10,12 @@ class SectionRepository implements ISections
     public function index()
     {
         $sections = Section::all();
-        return view('sections.index', compact('sections'));
+        return inertia('sections/SectionList', compact('sections'));
     }
 
     public function create()
     {
-        return view('sections.add');
+        return inertia('sections/SectionForm');
     }
 
     public function store($request)
@@ -31,8 +31,8 @@ class SectionRepository implements ISections
 
     public function edit($id)
     {
-        $sections = Section::findOrFail($id);
-        return view('sections.edit', compact('sections'));
+        $section = Section::findOrFail($id);
+        return inertia('sections/SectionForm', compact('section'));
     }
 
     public function update($request)

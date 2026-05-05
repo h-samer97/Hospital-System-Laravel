@@ -11,12 +11,12 @@ class IncuranceRepository implements IIncurance
     {
         $incurance = Incurance::all();
 
-        return view('incurance.index', compact('incurance'));
+        return inertia('incurance/InsuranceList', compact('incurance'));
     }
 
     public function create()
     {
-        return view('incurance.create');
+        return inertia('incurance/InsuranceForm');
     }
 
     public function store($request)
@@ -43,7 +43,7 @@ class IncuranceRepository implements IIncurance
     {
         $incurance = Incurance::findOrFail($id);
 
-        return view('incurance.edit', compact('incurance'));
+        return inertia('incurance/InsuranceForm', compact('incurance'));
     }
 
     public function update($request)

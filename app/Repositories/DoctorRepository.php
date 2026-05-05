@@ -17,7 +17,7 @@ class DoctorRepository implements IDoctor
     {
         $doctors = Doctor::with('section')->get();
 
-        return view('doctors.index', compact('doctors'));
+        return inertia('doctors/DoctorList', compact('doctors'));
     }
 
     public function create()
@@ -25,7 +25,7 @@ class DoctorRepository implements IDoctor
         $sections = Section::all();
         $appointments = Appointment::all();
 
-        return view('doctors.add', compact('sections', 'appointments'));
+        return inertia('doctors/DoctorForm', compact('sections', 'appointments'));
     }
 
     public function store($request)
@@ -140,6 +140,6 @@ class DoctorRepository implements IDoctor
         $doctor = Doctor::findOrFail($id);
         $sections = Section::all();
 
-        return view('doctors.edit', compact('doctor', 'sections'));
+        return inertia('doctors/DoctorForm', compact('doctor', 'sections'));
     }
 }

@@ -7,10 +7,11 @@ use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SingleServicesController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
 // Admin Routes
 Route::get('/dashboard/admin', function () {
-    return view('dashboard.admin.dashboard');
+    return Inertia::render('dashboard/AdminDashboard');
 })->middleware(['auth:admin'])->name('dashboard.admin');
 
 Route::get('/login/admin', function () {
@@ -44,6 +45,8 @@ Route::middleware(['auth:admin'])->group(function () {
 
     Route::resource('patients', PatientController::class);
 
-    Route::view('single_invoices', 'livewire.SingleInvoices.index')->name('single_invoices');
+    Route::get('single_invoices', function () {
+        return Inertia::render('singleInvoices/SingleInvoiceManager');
+    })->name('single_invoices');
 
 });

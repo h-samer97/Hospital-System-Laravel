@@ -17,7 +17,7 @@ class AmbulanceRepository implements IAmbulance
     {
         $incurances = Incurance::all();
 
-        return view('ambulances.create', compact('incurances'));
+        return inertia('ambulances/AmbulanceForm', compact('incurances'));
     }
 
     public function store($request)
@@ -38,7 +38,7 @@ class AmbulanceRepository implements IAmbulance
         $ambulance = Ambulance::findOrFail($id);
         $incurances = Incurance::all();
 
-        return view('ambulances.edit', compact('ambulance', 'incurances'));
+        return inertia('ambulances/AmbulanceForm', compact('ambulance', 'incurances'));
     }
 
     public function update($request)

@@ -11,7 +11,7 @@ class SingleServiceRepository implements ISingleService
     {
         $services = SingleServices::all();
 
-        return view('admin.services.index', compact('services'));
+        return inertia('singleInvoices/SingleInvoiceManager', compact('services'));
     }
 
     public function store($request)
