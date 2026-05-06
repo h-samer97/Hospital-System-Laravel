@@ -9,8 +9,8 @@ class SectionRepository implements ISections
 {
     public function index()
     {
-        $sections = Section::all();
-        return inertia('sections/SectionList', compact('sections'));
+        $sections = Section::latest()->get();
+        return inertia('sections/SectionList', ['sections' => $sections]);
     }
 
     public function create()

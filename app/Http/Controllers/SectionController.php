@@ -37,14 +37,14 @@ class SectionController extends Controller
         return $this->section->update($request);
     }
 
-    public function edit()
+    public function edit($id)
     {
-        return $this->section->edit($section);
+        return $this->section->edit($id);
     }
 
    
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        return $this->section->destroy($request);
+        return $this->section->destroy($id);
     }
 }

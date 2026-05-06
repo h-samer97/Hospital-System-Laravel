@@ -29,6 +29,15 @@ const SimpleLayout: React.FC<Props> = ({ children, title }) => {
                             <a href="/sections" className="text-gray-600 hover:text-gray-900">
                                 Sections
                             </a>
+                            <a href="/ambulance" className="text-gray-600 hover:text-gray-900">
+                                Ambulance
+                            </a>
+                            <a href="/insurance" className="text-gray-600 hover:text-gray-900">
+                                Insurance
+                            </a>
+                            <a href="/single_invoices" className="text-gray-600 hover:text-gray-900">
+                                Single Invoices
+                            </a>
                         </nav>
                     </div>
                 </div>

@@ -29,4 +29,23 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    /**
+     * Check if user has a specific role
+     */
+    public function hasRole(string $role): bool
+    {
+        // For now, check if email contains role indicators
+        // This is a temporary solution - you should implement proper role system
+        $email = $this->email;
+        
+        return match($role) {
+            'admin' => str_contains($email, 'admin') || $this->id === 1,
+            'doctor' => str_contains($email, 'doctor') || str_contains($email, 'dr'),
+            'ray_employee' => str_contains($email, 'ray') || str_contains($email, 'xray'),
+            'laboratorie_employee' => str_contains($email, 'lab') || str_contains($email, 'laboratory'),
+            'user' => true, // Default role for all users
+            default => false,
+        };
+    }
 }

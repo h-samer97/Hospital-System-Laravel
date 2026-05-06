@@ -1,60 +1,67 @@
-import React, { useState } from 'react';
-import { Ambulance } from './types';
-import DeleteAmbulanceModal from './DeleteAmbulanceModal';
+import React from 'react';
+import { Link } from '@inertiajs/react';
+import SimpleLayout from '../Layout/SimpleLayout';
 
-const AmbulanceList: React.FC = () => {
-    const [ambulances, setAmbulances] = useState<Ambulance[]>([]); // يتم جلبها عبر Axios لاحقاً
-    const [selectedAmbulance, setSelectedAmbulance] = useState<Ambulance | null>(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
+interface Ambulance {
+    id: number;
+    name: string;
+    number: string;
+    phone: string;
+    incurance_id: number;
+    created_at: string;
+}
 
-    const openDeleteModal = (ambulance: Ambulance) => {
-        setSelectedAmbulance(ambulance);
-        setShowDeleteModal(true);
-    };
-
+const AmbulanceList: React.FC<{ ambulances?: Ambulance[] }> = ({ ambulances = [] }) => {
     return (
-        <div className="card">
-            <div className="card-header pb-0">
-                <div className="d-flex justify-content-between">
-                    <h4 className="card-title mg-b-0">سيارات الإسعاف</h4>
-                    <button className="btn btn-primary">إضافة سيارة جديدة</button>
-                </div>
+        <SimpleLayout title="Ambulances">
+            <div className="mb-6 flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">Ambulances List</h2>
+                <Link 
+                    href="/ambulance/create" 
+                    className="btn btn-primary"
+                >
+                    Add New Ambulance
+                </Link>
             </div>
-            <div className="card-body">
-                <div className="table-responsive">
-                    <table className="table text-md-nowrap">
+
+            <div className="card">
+                <div className="overflow-x-auto">
+                    <table className="table">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>رقم السيارة</th>
-                                <th>موديل السيارة</th>
-                                <th>نوع السيارة</th>
-                                <th>اسم السائق</th>
-                                <th>حالة السيارة</th>
-                                <th>العمليات</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Number</th>
+                                <th>Phone</th>
+                                <th>Insurance ID</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {ambulances.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.car_number}</td>
-                                    <td>{item.car_model}</td>
-                                    <td>{item.car_type === '1' ? 'مملوكة' : 'ايجار'}</td>
-                                    <td>{item.driver_name}</td>
+                            {ambulances.map((ambulance) => (
+                                <tr key={ambulance.id}>
+                                    <td>{ambulance.id}</td>
+                                    <td className="font-medium">{ambulance.name}</td>
+                                    <td>{ambulance.number}</td>
+                                    <td>{ambulance.phone}</td>
+                                    <td>{ambulance.incurance_id}</td>
+                                    <td>{ambulance.created_at}</td>
                                     <td>
-                                        <span className={`badge ${item.is_available ? 'badge-success' : 'badge-danger'}`}>
-                                            {item.is_available ? 'مفعلة' : 'غير مفعلة'}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <button className="btn btn-sm btn-info me-1"><i className="fas fa-edit"></i></button>
-                                        <button 
-                                            className="btn btn-sm btn-danger"
-                                            onClick={() => openDeleteModal(item)}
-                                        >
-                                            <i className="fas fa-trash"></i>
-                                        </button>
+                                        <div className="flex space-x-2">
+                                            <Link 
+                                                href={`/ambulance/${ambulance.id}/edit`}
+                                                className="btn btn-secondary text-sm"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button 
+                                                className="btn btn-danger text-sm"
+                                                onClick={() => console.log('Delete ambulance:', ambulance.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -62,13 +69,7 @@ const AmbulanceList: React.FC = () => {
                     </table>
                 </div>
             </div>
-            {showDeleteModal && selectedAmbulance && (
-                <DeleteAmbulanceModal 
-                    ambulance={selectedAmbulance} 
-                    onClose={() => setShowDeleteModal(false)} 
-                />
-            )}
-        </div>
+        </SimpleLayout>
     );
 };
 

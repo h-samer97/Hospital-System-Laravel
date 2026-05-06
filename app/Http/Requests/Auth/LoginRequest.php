@@ -30,6 +30,7 @@ class LoginRequest extends FormRequest
         return [
             'email' => ['required', 'string', 'email'],
             'password' => ['required', 'string'],
+            'role' => ['nullable', 'string', 'in:user,admin,doctor,ray_employee,laboratorie_employee'],
         ];
     }
 
@@ -42,7 +43,23 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        $role = $this->input('role');
+        $guard = $role === 'admin' ? 'admin' : 'web';
+
+        \Log::info('LoginRequest authenticate', [
+            'email' => $this->input('email'),
+            'role' => $role,
+            'guard' => $guard,
+            'credentials' => $this->only('email', 'password')
+        ]);
+
+        if (! Auth::guard($guard)->attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+            \Log::error('Authentication failed', [
+                'email' => $this->input('email'),
+                'role' => $role,
+                'guard' => $guard
+            ]);
+            
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -50,7 +67,52 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        \Log::info('Authentication attempt successful', [
+            'email' => $this->input('email'),
+            'role' => $role,
+            'guard' => $guard,
+            'authenticated' => Auth::guard($guard)->check()
+        ]);
+
+        // Check role-based authentication if role is specified
+        if ($role && Auth::guard($guard)->check()) {
+            $user = Auth::guard($guard)->user();
+            \Log::info('Checking user role', [
+                'user_id' => $user->id ?? null,
+                'user_type' => get_class($user),
+                'hasRole_method' => method_exists($user, 'hasRole'),
+                'required_role' => $role
+            ]);
+            
+            if (method_exists($user, 'hasRole') && !$user->hasRole($role)) {
+                \Log::error('Role verification failed', [
+                    'user_id' => $user->id,
+                    'required_role' => $role
+                ]);
+                
+                Auth::guard($guard)->logout();
+                RateLimiter::hit($this->throttleKey());
+                
+                throw ValidationException::withMessages([
+                    'email' => 'هذا الحساب غير مسجل كـ ' . $this->getRoleLabel($role),
+                ]);
+            }
+        }
+
         RateLimiter::clear($this->throttleKey());
+    }
+
+    private function getRoleLabel(string $role): string
+    {
+        $labels = [
+            'user' => 'مريض',
+            'admin' => 'مدير',
+            'doctor' => 'دكتور',
+            'ray_employee' => 'موظف أشعة',
+            'laboratorie_employee' => 'موظف مختبر',
+        ];
+
+        return $labels[$role] ?? $role;
     }
 
     /**

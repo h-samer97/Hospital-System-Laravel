@@ -27,7 +27,7 @@ class AdminController extends Controller
     public function logout()
     {
         auth()->guard('admin')->logout();
-        return redirect()->route('dashboard.admin');
+        return redirect('/login');
     }
 
     public function store(AdminLoginRequest $request)

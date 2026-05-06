@@ -9,9 +9,9 @@ class SingleServiceRepository implements ISingleService
 {
     public function index()
     {
-        $services = SingleServices::all();
+        $invoices = SingleServices::with(['patient', 'doctor', 'service'])->latest()->get();
 
-        return inertia('singleInvoices/SingleInvoiceManager', compact('services'));
+        return inertia('singleInvoices/SingleInvoiceManager', ['invoices' => $invoices]);
     }
 
     public function store($request)

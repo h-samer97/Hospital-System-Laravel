@@ -29,6 +29,42 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        $role = $request->input('role');
+        $guard = $role === 'admin' ? 'admin' : 'web';
+        
+        // Debug logging
+        \Log::info('Login attempt', [
+            'email' => $request->input('email'),
+            'role' => $role,
+            'guard' => $guard
+        ]);
+        
+        $request->authenticate();
+
+        $request->session()->regenerate();
+
+        // Debug logging after auth
+        \Log::info('Authentication successful', [
+            'email' => $request->input('email'),
+            'role' => $role,
+            'guard' => $guard,
+            'authenticated' => Auth::guard($guard)->check()
+        ]);
+
+        // Redirect based on role
+        if ($role === 'admin') {
+            return redirect()->intended(route('dashboard.admin', absolute: false));
+        }
+
+        return redirect()->intended(route('dashboard', absolute: false));
+    }
+
+    /**
+     * Handle an incoming admin authentication request.
+     */
+    public function adminStore(LoginRequest $request): RedirectResponse
+    {
+        $request->merge(['role' => 'admin']);
         $request->authenticate();
 
         $request->session()->regenerate();

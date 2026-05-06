@@ -10,7 +10,8 @@ class AmbulanceRepository implements IAmbulance
 {
     public function index()
     {
-        return Ambulance::all();
+        $ambulances = Ambulance::latest()->get();
+        return inertia('ambulances/AmbulanceList', ['ambulances' => $ambulances]);
     }
 
     public function create()

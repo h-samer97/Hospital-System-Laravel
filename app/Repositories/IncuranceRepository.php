@@ -9,9 +9,9 @@ class IncuranceRepository implements IIncurance
 {
     public function index()
     {
-        $incurance = Incurance::all();
+        $insurances = Incurance::latest()->get();
 
-        return inertia('incurance/InsuranceList', compact('incurance'));
+        return inertia('incurance/InsuranceList', ['insurances' => $insurances]);
     }
 
     public function create()

@@ -28,9 +28,9 @@ class InsuranceController extends Controller
         return $this->incurance->store($request);
     }
 
-    public function edit(Request $insurance)
+    public function edit($id)
     {
-        return $this->incurance->edit($insurance);
+        return $this->incurance->edit($id);
     }
 
     public function update(UpdateInsuranceRequest $request)
@@ -38,8 +38,8 @@ class InsuranceController extends Controller
         return $this->incurance->update($request);
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        return $this->incurance->destroy($insurance);
+        return $this->incurance->destroy($id);
     }
 }

@@ -15,9 +15,9 @@ class DoctorRepository implements IDoctor
 
     public function index()
     {
-        $doctors = Doctor::with('section')->get();
+        $doctors = Doctor::with('section')->latest()->get();
 
-        return inertia('doctors/DoctorList', compact('doctors'));
+        return inertia('doctors/DoctorList', ['doctors' => $doctors]);
     }
 
     public function create()

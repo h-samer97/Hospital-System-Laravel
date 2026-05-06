@@ -9,7 +9,7 @@ class PatientController extends Controller
 {
     protected IPatient $patient;
 
-    public function __constrauct(IPatient $patient)
+    public function __construct(IPatient $patient)
     {
         $this->patient = $patient;
     }
@@ -29,9 +29,9 @@ class PatientController extends Controller
         return $this->patient->store($request);
     }
 
-    public function edit(StorePatientRequest $request)
+    public function edit($id)
     {
-        return $this->patient->edit($request);
+        return $this->patient->edit($id);
     }
 
     public function update(Request $request)
@@ -39,8 +39,8 @@ class PatientController extends Controller
         return $this->patient->update($request);
     }
 
-    public function destroy(Request $request)
+    public function destroy($id)
     {
-        return $this->patient->destroy($request);
+        return $this->patient->destroy($id);
     }
 }

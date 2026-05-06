@@ -31,9 +31,9 @@ class AmbulancesController extends Controller
 
     public function show(Ambulances $ambulances) {}
 
-    public function edit(Request $ambulances)
+    public function edit($id)
     {
-        return $this->ambulance->edit($ambulances);
+        return $this->ambulance->edit($id);
     }
 
     public function update(Request $request, Ambulances $ambulances)
@@ -41,8 +41,8 @@ class AmbulancesController extends Controller
         return $this->ambulance->update($request);
     }
 
-    public function destroy(Ambulances $ambulances)
+    public function destroy($id)
     {
-        return $this->ambulance->destroy($ambulances);
+        return $this->ambulance->destroy($id);
     }
 }

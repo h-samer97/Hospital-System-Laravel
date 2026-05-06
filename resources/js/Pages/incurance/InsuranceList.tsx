@@ -1,52 +1,78 @@
-import React, { useState } from 'react';
-import { Insurance } from './types';
-import DeleteInsuranceModal from './DeleteInsuranceModal';
+import React from 'react';
+import { Link } from '@inertiajs/react';
+import SimpleLayout from '../Layout/SimpleLayout';
 
-const InsuranceList: React.FC = () => {
-    const [insurances, setInsurances] = useState<Insurance[]>([]);
-    const [selectedInsurance, setSelectedInsurance] = useState<Insurance | null>(null);
-    const [showDeleteModal, setShowDeleteModal] = useState(false);
+interface Insurance {
+    id: number;
+    name: string;
+    insurance_code: string;
+    discount_percentage: number;
+    Company_rate: number;
+    status: number;
+    created_at: string;
+}
 
+const InsuranceList: React.FC<{ insurances?: Insurance[] }> = ({ insurances = [] }) => {
     return (
-        <div className="card">
-            <div className="card-header">
-                <button className="btn btn-primary">إضافة شركة تأمين</button>
+        <SimpleLayout title="Insurance">
+            <div className="mb-6 flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">Insurance List</h2>
+                <Link 
+                    href="/insurance/create" 
+                    className="btn btn-primary"
+                >
+                    Add New Insurance
+                </Link>
             </div>
-            <div className="card-body">
-                <div className="table-responsive">
-                    <table className="table text-md-nowrap text-center">
+
+            <div className="card">
+                <div className="overflow-x-auto">
+                    <table className="table">
                         <thead>
-                            <tr className="table-secondary">
-                                <th>#</th>
-                                <th>كود الشركة</th>
-                                <th>اسم الشركة</th>
-                                <th>نسبة الخصم %</th>
-                                <th>تحمل الشركة %</th>
-                                <th>الحالة</th>
-                                <th>العمليات</th>
+                            <tr>
+                                <th>ID</th>
+                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Discount %</th>
+                                <th>Company Rate %</th>
+                                <th>Status</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {insurances.map((item, index) => (
-                                <tr key={item.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{item.insurance_code}</td>
-                                    <td>{item.name}</td>
-                                    <td>{item.discount_percentage}%</td>
-                                    <td>{item.Company_rate}%</td>
+                            {insurances.map((insurance) => (
+                                <tr key={insurance.id}>
+                                    <td>{insurance.id}</td>
+                                    <td>{insurance.insurance_code}</td>
+                                    <td className="font-medium">{insurance.name}</td>
+                                    <td>{insurance.discount_percentage}%</td>
+                                    <td>{insurance.Company_rate}%</td>
                                     <td>
-                                        <span className={`badge ${item.status === 1 ? 'bg-success' : 'bg-danger'}`}>
-                                            {item.status === 1 ? 'مفعل' : 'غير مفعل'}
+                                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                                            insurance.status === 1 
+                                                ? 'bg-green-100 text-green-800' 
+                                                : 'bg-red-100 text-red-800'
+                                        }`}>
+                                            {insurance.status === 1 ? 'Active' : 'Inactive'}
                                         </span>
                                     </td>
+                                    <td>{insurance.created_at}</td>
                                     <td>
-                                        <button className="btn btn-sm btn-success me-1"><i className="fas fa-edit"></i></button>
-                                        <button 
-                                            className="btn btn-sm btn-danger"
-                                            onClick={() => { setSelectedInsurance(item); setShowDeleteModal(true); }}
-                                        >
-                                            <i className="fas fa-trash"></i>
-                                        </button>
+                                        <div className="flex space-x-2">
+                                            <Link 
+                                                href={`/insurance/${insurance.id}/edit`}
+                                                className="btn btn-secondary text-sm"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button 
+                                                className="btn btn-danger text-sm"
+                                                onClick={() => console.log('Delete insurance:', insurance.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -54,12 +80,8 @@ const InsuranceList: React.FC = () => {
                     </table>
                 </div>
             </div>
-            {showDeleteModal && selectedInsurance && (
-                <DeleteInsuranceModal 
-                    insurance={selectedInsurance} 
-                    onClose={() => setShowDeleteModal(false)} 
-                />
-            )}
-        </div>
+        </SimpleLayout>
     );
 };
+
+export default InsuranceList;

@@ -11,4 +11,25 @@ class Admin extends Authenticatable
         'email',
         'password',
     ];
+
+    /**
+     * Get the attributes that should be cast.
+     *
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
+
+    /**
+     * Check if admin has a specific role
+     */
+    public function hasRole(string $role): bool
+    {
+        return $role === 'admin';
+    }
 }

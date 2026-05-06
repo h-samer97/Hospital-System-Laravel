@@ -8,7 +8,8 @@ class PatientRepository implements IPatient
 {
     public function index()
     {
-        return inertia('patients/PatientList');
+        $patients = \App\Models\Patient::latest()->get();
+        return inertia('patients/SimplePatientList', ['patients' => $patients]);
     }
 
     public function create()

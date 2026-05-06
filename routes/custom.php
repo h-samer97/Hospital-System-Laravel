@@ -1,11 +1,13 @@
 <?php
 
 use App\Http\Controllers\Auth\AdminController;
-use App\Http\Controllers\dashboard\AmbulanceController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\AmbulancesController;
 use App\Http\Controllers\dashboard\DoctorController;
 use App\Http\Controllers\InsuranceController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\SingleServicesController;
+use App\Http\Controllers\PatientController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -15,10 +17,10 @@ Route::get('/dashboard/admin', function () {
 })->middleware(['auth:admin'])->name('dashboard.admin');
 
 Route::get('/login/admin', function () {
-    return redirect()->route('login');
-});
+    return Inertia::render('dashboard/forms/Login');
+})->name('login.admin.view');
 
-Route::post('/login/admin', [AdminController::class, 'login'])->name('login.admin');
+Route::post('/login/admin', [AuthenticatedSessionController::class, 'store'])->name('login.admin');
 
 Route::post('/logout/admin', [AdminController::class, 'logout'])->name('logout.admin');
 
@@ -37,11 +39,13 @@ Route::middleware(['auth:admin'])->group(function () {
     // Single Services
 
     Route::resource('single_services', SingleServicesController::class)->names('SingleService');
-    Route::view('Add_GroupServices', 'livewire.include_create')->name('Add_GroupServices');
+    Route::get('Add_GroupServices', function () {
+    return Inertia::render('groupservices/ServiceGroupForm');
+})->name('Add_GroupServices');
 
     Route::resource('insurance', InsuranceController::class);
 
-    Route::resource('ambulance', AmbulanceController::class);
+    Route::resource('ambulance', AmbulancesController::class);
 
     Route::resource('patients', PatientController::class);
 

@@ -22,7 +22,7 @@ class SingleServicesController extends Controller
 
     public function create()
     {
-        return view('admin.services.create');
+        return $this->singleService->create();
     }
 
     public function store(Request $request)
@@ -32,18 +32,18 @@ class SingleServicesController extends Controller
 
     public function show(SingleServices $singleServices) {}
 
-    public function edit(SingleServices $singleServices)
+    public function edit($id)
     {
-        return view('admin.services.edit', compact('singleServices'));
+        return $this->singleService->edit($id);
     }
 
-    public function update(Request $request, SingleServices $singleServices)
+    public function update(Request $request, $id)
     {
-        return $this->singleService->update($request, $singleServices);
+        return $this->singleService->update($request, $id);
     }
 
-    public function destroy(SingleServices $singleServices)
+    public function destroy($id)
     {
-        return $this->singleService->destroy($singleServices);
+        return $this->singleService->destroy($id);
     }
 }

@@ -1,51 +1,58 @@
-import React, { useState } from 'react';
-import { Section } from './types';
-import SectionModal from './SectionModal';
-import SectionDeleteModal from './SectionDeleteModal';
+import React from 'react';
+import { Link } from '@inertiajs/react';
+import SimpleLayout from '../Layout/SimpleLayout';
 
-const SectionList: React.FC = () => {
-    const [sections, setSections] = useState<Section[]>([]); 
-    const [activeModal, setActiveModal] = useState<'add' | 'edit' | 'delete' | null>(null);
-    const [selectedSection, setSelectedSection] = useState<Section | null>(null);
+interface Section {
+    id: number;
+    name: string;
+    created_at: string;
+}
 
-    const handleAction = (type: 'edit' | 'delete', section: Section) => {
-        setSelectedSection(section);
-        setActiveModal(type);
-    };
-
+const SectionList: React.FC<{ sections?: Section[] }> = ({ sections = [] }) => {
     return (
-        <div className="card">
-            <div className="card-header pb-0">
-                <div className="d-flex justify-content-between">
-                    <button className="btn btn-primary" onClick={() => setActiveModal('add')}>
-                        إضافة قسم جديد
-                    </button>
-                </div>
+        <SimpleLayout title="Sections">
+            <div className="mb-6 flex justify-between items-center">
+                <h2 className="text-2xl font-bold text-gray-900">Sections List</h2>
+                <Link 
+                    href="/sections/create" 
+                    className="btn btn-primary"
+                >
+                    Add New Section
+                </Link>
             </div>
-            <div className="card-body">
-                <div className="table-responsive">
-                    <table className="table text-md-nowrap" id="example2">
+
+            <div className="card">
+                <div className="overflow-x-auto">
+                    <table className="table">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>اسم القسم</th>
-                                <th>تاريخ الإنشاء</th>
-                                <th>العمليات</th>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Created At</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {sections.map((section, index) => (
+                            {sections.map((section) => (
                                 <tr key={section.id}>
-                                    <td>{index + 1}</td>
-                                    <td>{section.name}</td>
+                                    <td>{section.id}</td>
+                                    <td className="font-medium">{section.name}</td>
                                     <td>{section.created_at}</td>
                                     <td>
-                                        <button className="btn btn-sm btn-info me-1" onClick={() => handleAction('edit', section)}>
-                                            <i className="las la-pen"></i>
-                                        </button>
-                                        <button className="btn btn-sm btn-danger" onClick={() => handleAction('delete', section)}>
-                                            <i className="las la-trash"></i>
-                                        </button>
+                                        <div className="flex space-x-2">
+                                            <Link 
+                                                href={`/sections/${section.id}/edit`}
+                                                className="btn btn-secondary text-sm"
+                                            >
+                                                Edit
+                                            </Link>
+                                            <button 
+                                                className="btn btn-danger text-sm"
+                                                onClick={() => console.log('Delete section:', section.id)}
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -53,21 +60,8 @@ const SectionList: React.FC = () => {
                     </table>
                 </div>
             </div>
-
-            {/* التحقق من النوع لفتح الـ Modal المناسب */}
-            {(activeModal === 'add' || activeModal === 'edit') && (
-                <SectionModal 
-                    type={activeModal} 
-                    section={selectedSection} 
-                    onClose={() => setActiveModal(null)} 
-                />
-            )}
-            {activeModal === 'delete' && selectedSection && (
-                <SectionDeleteModal 
-                    section={selectedSection} 
-                    onClose={() => setActiveModal(null)} 
-                />
-            )}
-        </div>
+        </SimpleLayout>
     );
 };
+
+export default SectionList;
