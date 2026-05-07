@@ -1,0 +1,67 @@
+.dashboardPage {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.welcomeBanner {
+  background: linear-gradient(135deg, #2b6cb0, #4299e1);
+  color: #fff;
+  border-radius: 12px;
+  padding: 24px 28px;
+}
+
+.welcomeBanner h2 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.welcomeBanner p {
+  opacity: 0.85;
+  font-size: 14px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.statCard {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.statIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.statInfo {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.statValue {
+  font-size: 26px;
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.statLabel {
+  font-size: 13px;
+  color: #718096;
+}
