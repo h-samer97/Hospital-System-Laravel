@@ -1,6 +1,6 @@
 import { ReactNode, useState } from 'react';
-import Sidebar from './Sidebar';
-import Header from './Header';
+import Sidebar from '@/Components/Sidebar/Sidebar';
+import Header from '@/Components/Header/Header';
 import styles from './Dashboard.module.css';
 
 interface Props {
@@ -18,7 +18,13 @@ export default function Dashboard({ children, title = 'لوحة التحكم' }:
             <div className={`${styles.dashboardMain} ${sidebarOpen ? styles.dashboardMainSidebarOpen : ''}`}>
                 <Header
                     title={title}
-                    onToggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+                    userType="Admin"
+                    onToggleSidebar={() => setSidebarOpen(prev => !prev)}
+                    links={[
+                        { label: 'الرئيسية',      href: '/' },
+                        { label: 'الملف الشخصي',  href: '/profile' },
+                        { label: 'الإعدادات',      href: '/settings' },
+                    ]}
                 />
                 <main className={styles.dashboardContent}>
                     {children}

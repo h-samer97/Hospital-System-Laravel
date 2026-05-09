@@ -1,0 +1,161 @@
+/* ===== Header.module.css ===== */
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    height: 64px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+}
+
+/* ===== Right Side (Title + Toggle) ===== */
+.headerRight {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.toggleBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: #4a5568;
+    cursor: pointer;
+    font-size: 20px;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    flex-shrink: 0;
+}
+
+.toggleBtn:hover {
+    background-color: #f7fafc;
+    color: #1a202c;
+}
+
+.headerTitle {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0;
+    white-space: nowrap;
+}
+
+/* ===== Left Side (Links + User) ===== */
+.headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ===== Nav Links ===== */
+.headerLinks {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    margin-left: 12px;
+}
+
+.headerLink {
+    padding: 6px 12px;
+    border-radius: 7px;
+    color: #4a5568;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.15s ease, color 0.15s ease;
+    white-space: nowrap;
+}
+
+.headerLink:hover {
+    background-color: #f0f4f8;
+    color: #1a202c;
+}
+
+.headerLinkActive {
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+}
+
+/* ===== Divider ===== */
+.divider {
+    width: 1px;
+    height: 28px;
+    background-color: #e2e8f0;
+    margin: 0 8px;
+    flex-shrink: 0;
+}
+
+/* ===== User Badge ===== */
+.userBadge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px 6px 8px;
+    border-radius: 8px;
+    background-color: #ebf8ff;
+    color: #2b6cb0;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    white-space: nowrap;
+    border: none;
+}
+
+.userBadge:hover {
+    background-color: #bee3f8;
+}
+
+.userAvatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #3182ce;
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.userType {
+    font-size: 13px;
+    font-weight: 600;
+    color: #2b6cb0;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+    .header {
+        padding: 0 14px;
+        height: 56px;
+    }
+
+    .headerLinks {
+        display: none;
+    }
+
+    .divider {
+        display: none;
+    }
+
+    .headerTitle {
+        font-size: 15px;
+    }
+}

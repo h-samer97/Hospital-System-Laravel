@@ -1,29 +1,37 @@
 <?php
 
-use App\Http\Controllers\Dashboard\DashboardController;
-use App\Http\Controllers\Dashboard\Auth\AdminAuthController;
+use App\Http\Controllers\Auth\DashboardController;
+use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
+use Inertia\Inertia;
 
-// Admin Auth
-Route::prefix('admin')->name('admin.')->group(function () {
 
-    // Guest routes
-    Route::middleware('guest:admin')->group(function () {
-        Route::get('login', [AdminAuthController::class, 'showLogin'])
-            ->name('login');
-        Route::post('login', [AdminAuthController::class, 'login'])
-            ->name('login.post');
-    });
+Route::middleware("guest")->group(function () {
+    Route::get('/', function () {
+        return Inertia::render('Auth/MultiLogin/MultiLoginPage');
+        });
+        
+        // ===== POST routes لكل دور =====
+Route::post('/login/user',                 [LoginController::class, 'loginUser'])          ->name('login.user');
+Route::post('/login/admin',                [LoginController::class, 'loginAdmin'])         ->name('login.admin');
+Route::post('/login/doctor',               [LoginController::class, 'loginDoctor'])        ->name('login.doctor');
+Route::post('/login/ray',                  [LoginController::class, 'loginRayEmployee'])   ->name('login.ray');
+Route::post('/login/pharmacy',             [LoginController::class, 'loginPharmacyEmployee'])->name('login.pharmacy');
+Route::post('/login/lab',                  [LoginController::class, 'loginLabEmployee'])   ->name('login.lab');
 
-    // Protected routes
-    Route::middleware('auth:admin')->group(function () {
-        Route::get('dashboard', [DashboardController::class, 'index'])
-            ->name('dashboard');
-        Route::post('logout', [AdminAuthController::class, 'logout'])
-            ->name('logout');
-    });
+    Route::get('/login/{role}', function ($role) {
+        if (!in_array($role, ['user', 'admin'])) {
+            abort(404);
+        }
+        return Inertia::render('Auth/MultiLogin/LoginPage', [
+            'role' => $role,
+        ]);
+    })->name('login');
 });
 
 
 
-
+Route::middleware("auth:web")->group(function () {
+    Route::get("dashboard/user", [DashboardController::class, "index"])->name("dashboard.user");
+    Route::get('dashboard/admin',  [DashboardController::class, 'adminIndex'])->name('admin.dashboard');
+});
