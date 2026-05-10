@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 
 Route::middleware("guest")->group(function () {
@@ -20,12 +21,12 @@ Route::post('/login/pharmacy',             [LoginController::class, 'loginPharma
 Route::post('/login/lab',                  [LoginController::class, 'loginLabEmployee'])   ->name('login.lab');
 
     Route::get('/login/{role}', function ($role) {
-        if (!in_array($role, ['user', 'admin'])) {
+        if (!in_array($role, ['user', 'admins'])) {
             abort(404);
-        }
-        return Inertia::render('Auth/MultiLogin/LoginPage', [
-            'role' => $role,
-        ]);
+            }
+            return Inertia::render('Auth/MultiLogin/LoginPage', [
+                'role' => $role,
+            ]);
     })->name('login');
 });
 
@@ -33,5 +34,8 @@ Route::post('/login/lab',                  [LoginController::class, 'loginLabEmp
 
 Route::middleware("auth:web")->group(function () {
     Route::get("dashboard/user", [DashboardController::class, "index"])->name("dashboard.user");
-    Route::get('dashboard/admin',  [DashboardController::class, 'adminIndex'])->name('admin.dashboard');
+});
+
+Route::middleware("auth:admins")->group(function () {
+    Route::get('dashboard/admin',  [AdminDashboardController::class, 'index'])->name('admin.dashboard');
 });

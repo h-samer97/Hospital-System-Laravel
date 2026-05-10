@@ -6,6 +6,10 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Auth\Events\Lockout;
+use Illuminate\Support\Str;
+use App\Http\Requests\AdminLoginRequest;
 
 class LoginController extends Controller
 {
@@ -23,9 +27,9 @@ class LoginController extends Controller
     }
 
     // ===== مشرف =====
-    public function loginAdmin(Request $request)
+    public function loginAdmin(AdminLoginRequest $request)
     {
-        return $this->attemptLogin($request, 'web', '/dashboard/admin');
+        return $this->attemptLogin($request, 'admins', '/dashboard/admin');
     }
 
     // ===== دكتور =====
