@@ -1,5 +1,5 @@
 import DashboardLayout from '@/Layouts/DashboardLayout';
-import styles from './Index.module.css';
+import styles from './Dashboard.module.css';
 
 interface Admin {
     name: string;

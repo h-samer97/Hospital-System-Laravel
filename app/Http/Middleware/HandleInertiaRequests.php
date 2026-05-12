@@ -3,42 +3,42 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\App;
 use Inertia\Middleware;
-use Tighten\Ziggy\Ziggy;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 
 class HandleInertiaRequests extends Middleware
 {
-    /**
-     * The root template that is loaded on the first page visit.
-     *
-     * @var string
-     */
     protected $rootView = 'app';
 
-    /**
-     * Determine the current asset version.
-     */
-    public function version(Request $request): ?string
-    {
-        return parent::version($request);
-    }
-
-    /**
-     * Define the props that are shared by default.
-     *
-     * @return array<string, mixed>
-     */
     public function share(Request $request): array
     {
-        return [
-            ...parent::share($request),
+        return array_merge(parent::share($request), [
+
             'auth' => [
-                'user' => $request->user(),
+                'user'  => $request->user(),
+                'admin' => $request->user('admins'),
             ],
-            'ziggy' => fn () => [
-                ...(new Ziggy)->toArray(),
-                'location' => $request->url(),
-            ],
-        ];
+           
+            'flash' => $request->session()->get('flash'),
+
+            // ✅ اللغة الحالية
+            'locale' => App::getLocale(),
+
+            // ✅ اتجاه الصفحة مباشرة من إعدادات mcamara
+            'dir' => LaravelLocalization::getCurrentLocaleDirection(),
+
+            // ✅ اللغات المدعومة من config/laravellocalization.php
+            'supportedLocales' => collect(LaravelLocalization::getSupportedLocales())
+                ->map(fn($props, $code) => [
+                    'code'   => $code,
+                    'native' => $props['native'],
+                    'dir'    => $props['dir'] ?? 'ltr',
+                    'url'    => LaravelLocalization::getLocalizedURL($code, null, [], true),
+                ])
+                ->values()
+                ->toArray(),
+
+        ]);
     }
 }

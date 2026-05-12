@@ -5,37 +5,58 @@ use App\Http\Controllers\Auth\LoginController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
+use App\Http\Controllers\SectionController;
 
+Route::group([
+    'prefix'     => LaravelLocalization::setLocale(),
+    'middleware' => [
+        'localize',
+        'localeSessionRedirect',
+        'localizationRedirect',
+        'localeViewPath',
+    ],
+], function () {
 
-Route::middleware("guest")->group(function () {
-    Route::get('/', function () {
-        return Inertia::render('Auth/MultiLogin/MultiLoginPage');
-        });
+    // الصفحة الرئيسية
+    Route::get('/', fn() => inertia('Welcome'))->name('home');
+
+    // Global Page type OF Guest :)
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', fn() => inertia('Auth/Login'))->name('login');
+        Route::get('/register', fn() => inertia('Auth/Register'))->name('register');
         
-        // ===== POST routes لكل دور =====
-Route::post('/login/user',                 [LoginController::class, 'loginUser'])          ->name('login.user');
-Route::post('/login/admin',                [LoginController::class, 'loginAdmin'])         ->name('login.admin');
-Route::post('/login/doctor',               [LoginController::class, 'loginDoctor'])        ->name('login.doctor');
-Route::post('/login/ray',                  [LoginController::class, 'loginRayEmployee'])   ->name('login.ray');
-Route::post('/login/pharmacy',             [LoginController::class, 'loginPharmacyEmployee'])->name('login.pharmacy');
-Route::post('/login/lab',                  [LoginController::class, 'loginLabEmployee'])   ->name('login.lab');
+        Route::get('/', function () {
+            return Inertia::render('Auth/MultiLogin/MultiLoginPage');
+        });
 
-    Route::get('/login/{role}', function ($role) {
-        if (!in_array($role, ['user', 'admins'])) {
-            abort(404);
+        // ===== POST routes لكل دور =====
+        Route::post('/login/user', [LoginController::class, 'loginUser'])->name('login.user');
+        Route::post('/login/admin', [LoginController::class, 'loginAdmin'])->name('login.admin');
+        Route::post('/login/doctor', [LoginController::class, 'loginDoctor'])->name('login.doctor');
+        Route::post('/login/ray', [LoginController::class, 'loginRayEmployee'])->name('login.ray');
+        Route::post('/login/pharmacy', [LoginController::class, 'loginPharmacyEmployee'])->name('login.pharmacy');
+        Route::post('/login/lab', [LoginController::class, 'loginLabEmployee'])->name('login.lab');
+
+        Route::get('/login/{role}', function ($role) {
+            if (!in_array($role, ['user', 'admins'])) {
+                abort(404);
             }
             return Inertia::render('Auth/MultiLogin/LoginPage', [
                 'role' => $role,
             ]);
-    })->name('login');
-});
+        })->name('login');
+    });
 
+    // Routes للمستخدمين العاديين
+    Route::middleware("auth:web")->group(function () {
+        Route::get("dashboard/user", [DashboardController::class, "index"])->name("dashboard.user");
+    });
 
-
-Route::middleware("auth:web")->group(function () {
-    Route::get("dashboard/user", [DashboardController::class, "index"])->name("dashboard.user");
-});
-
-Route::middleware("auth:admins")->group(function () {
-    Route::get('dashboard/admin',  [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+    // Routes للمسؤولين
+    Route::middleware("auth:admins")->group(function () {
+        Route::get('dashboard/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+        Route::resource('sections', SectionController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
+    });
 });
