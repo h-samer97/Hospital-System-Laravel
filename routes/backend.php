@@ -7,6 +7,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use Mcamara\LaravelLocalization\Facades\LaravelLocalization;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\DoctorController;
 
 Route::group([
     'prefix'     => LaravelLocalization::setLocale(),
@@ -58,5 +59,9 @@ Route::group([
         Route::get('dashboard/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
         Route::resource('sections', SectionController::class)
         ->only(['index', 'store', 'update', 'destroy']);
+
+        # Doctors Routes
+        Route::resource('doctors', DoctorController::class)
+        ->only(['index', 'store', 'update', 'destroy', 'edit', 'create']);
     });
 });
