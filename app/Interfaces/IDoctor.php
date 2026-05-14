@@ -12,6 +12,6 @@ interface IDoctor
 {
     public function index(): Response;
     public function store(StoreDoctorRequest $request): Response;
-    public function update(UpdateDoctorRequest $request, Doctor $doctor): Response;
+    public function update(UpdateDoctorRequest $request): Response;
     public function destroy(Doctor $doctor): Response;
 }

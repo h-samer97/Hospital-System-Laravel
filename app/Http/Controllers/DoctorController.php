@@ -2,17 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Interfaces\IDoctor;
 use App\Models\Doctor;
 use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
+    protected IDoctor $doctorRepository;
+
+    public function __construct(IDoctor $doctorRepository)
+    {
+        $this->doctorRepository = $doctorRepository;
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return $this->doctorRepository->index();
     }
 
     /**

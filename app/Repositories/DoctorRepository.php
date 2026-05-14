@@ -7,6 +7,9 @@ use App\Models\Doctor;
 use App\Models\Section;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use App\Http\Requests\Dashboard\StoreDoctorRequest;
+use App\Http\Requests\Dashboard\UpdateDoctorRequest;
+
 
 
 class DoctorRepository implements IDoctor
@@ -17,7 +20,7 @@ class DoctorRepository implements IDoctor
        ->select('id','section_id','name','email','phone','price','is_active','created_at', 'appointments')
        ->latest() # DASC
        ->get()
-       ->map(function ($doctor) {
+       ->map(function ($doctor) { # ===> Draw data Map ^_*
            return [
                'id' => $doctor->id,
                'section_id' => $doctor->section_id,
@@ -41,28 +44,67 @@ class DoctorRepository implements IDoctor
        ->select('id', 'name')
        ->get();
 
-        dd($doctors, $sections);
-
-    //    return inertia('Dashboard/Doctors/Index', [
-    //        'doctors' => $doctors,
-    //        'sections' => $sections,
-    //    ]);
+       return inertia('Doctors/Index', [
+           'doctors' => $doctors,
+           'sections' => $sections,
+       ]);
        
-      
     }
 
-    public function store(\App\Http\Requests\Dashboard\StoreDoctorRequest $request) : Response
+    public function store(StoreDoctorRequest $request) : Response
     {
-        // TODO: Implement store() method.
+
+        $data = $request->validated();
+        $doctor = Doctor::create($data);
+
+        if($request->hasFile('image')) {
+
+            $filename = $request->file('image')->store('doctors', 'public');
+            $doctor->image()->create([
+                'url' => $filename,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Doctor created successfully',
+        ]);
+        
     }
 
-    public function update(\App\Http\Requests\Dashboard\UpdateDoctorRequest $request, \App\Models\Doctor $doctor) : Response
+    public function update(UpdateDoctorRequest $request) : Response
     {
-        // TODO: Implement update() method.
+        $doctor = Doctor::findOrFail($request->id);
+        $data = $request->validated();
+
+        if(!empty($data['password'])) {
+            $data['password'] = Hash::make($data['password']);
+        } else {
+            unset($data['password']);
+        }
+
+
+        $doctor->update($data);
+
+        if($request->hasFile('image')) {
+
+            $filename = $request->file('image')->store('doctors', 'public');
+            $doctor->image()->create([
+                'url' => $filename,
+            ]);
+        }
+
+        return response()->json([
+            'message' => 'Doctor updated successfully',
+        ]);
+        
+
     }
 
     public function destroy(\App\Models\Doctor $doctor) : Response
     {
-        // TODO: Implement destroy() method.
+        $doctor->delete();
+        return response()->json([
+            'message' => 'Doctor deleted successfully',
+        ]);
     }
 }
