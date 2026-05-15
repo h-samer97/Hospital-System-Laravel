@@ -17,7 +17,7 @@ export interface Doctor {
     name: string;
     email: string;
     phone: string;
-    price: number;
+    price: number | string | null;
     is_active: boolean;
     created_at: string;
     appointments: string;
@@ -57,3 +57,16 @@ export interface UpdateDoctorRequest {
 export interface ApiResponse {
     message: string;
 }
+
+export interface DoctorFormData {
+    section_id: string | number;
+    name: string;
+    appointments: string;
+    email: string;
+    password: string;
+    phone: string;
+    price: string;
+    image: File | null;
+}
+
+export type DoctorSection = Section;
