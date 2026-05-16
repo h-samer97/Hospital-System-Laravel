@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import styles from './Header.module.css';
+import LanguageSwitcher from '@/Layouts/LanguageSwitcher';
 
 interface HeaderProps {
     title: string;
@@ -43,7 +44,9 @@ export default function Header({ title, userType, links, onToggleSidebar }: Head
                 )}
 
                 <div className={styles.divider} />
+LanguageSwitcher />
 
+                <
                 <div className={styles.userBadge}>
                     <div className={styles.userAvatar}>{userInitial}</div>
                     <span className={styles.userType}>{userLabel}</span>

@@ -9,11 +9,14 @@ use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
 use App\Http\Requests\Dashboard\StoreDoctorRequest;
 use App\Http\Requests\Dashboard\UpdateDoctorRequest;
-
+use App\Services\ImageUploadService;
 
 
 class DoctorRepository implements IDoctor
 {
+
+    use ImageUploadService;
+
     public function index() : Response
     {
        $doctors = Doctor::with(['section:id,name', 'image'])
@@ -32,8 +35,8 @@ class DoctorRepository implements IDoctor
                'created_at' => $doctor->created_at,
                'appointments' => $doctor->appointments,
                'section' => $doctor->section,
-               'image' => $doctor->image,
-               'image_url' => $doctor->image ? $doctor->image->url : null,
+               'image' => $this->getUrl($doctor, 'doctors'),
+            //    'image_url' => $doctor->image ? $doctor->image->url : null,
                'edit_url' => route('doctors.edit', $doctor->id),
                'delete_url' => route('doctors.destroy', $doctor->id),
                'store_url' => route('doctors.store'),
@@ -59,10 +62,7 @@ class DoctorRepository implements IDoctor
 
         if($request->hasFile('image')) {
 
-            $filename = $request->file('image')->store('doctors', 'public');
-            $doctor->image()->create([
-                'url' => $filename,
-            ]);
+           $this->Upload(Doctor::class, $request->file('image'), 'doctors');
         }
 
         return response()->json([
@@ -86,11 +86,7 @@ class DoctorRepository implements IDoctor
         $doctor->update($data);
 
         if($request->hasFile('image')) {
-
-            $filename = $request->file('image')->store('doctors', 'public');
-            $doctor->image()->create([
-                'url' => $filename,
-            ]);
+            $this->Upload(Doctor::class, $request->file('image'), 'doctors');
         }
 
         return response()->json([
@@ -100,9 +96,10 @@ class DoctorRepository implements IDoctor
 
     }
 
-    public function destroy(\App\Models\Doctor $doctor) : Response
+    public function destroy(Doctor $doctor) : Response
     {
         $doctor->delete();
+        $this->Delete(Doctor::class, 'doctors');
         return response()->json([
             'message' => 'Doctor deleted successfully',
         ]);

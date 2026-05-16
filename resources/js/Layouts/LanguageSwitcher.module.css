@@ -1,0 +1,15 @@
+/* LanguageSwitcher.module.css */
+.switcher { display: flex; gap: 0.35rem; }
+
+.btn {
+  padding: 0.3rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #6366f1;
+  text-decoration: none;
+  border: 1.5px solid #e2e8f0;
+  transition: all 0.2s;
+}
+.btn:hover  { background: #f1f5f9; }
+.active     { background: #6366f1; color: #fff; border-color: #6366f1; }

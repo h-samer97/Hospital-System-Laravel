@@ -60,6 +60,13 @@ return [
             'report' => false,
         ],
 
+        'doctors' => [
+            'driver' => 'local',
+            'root'   => storage_path('app/doctors'),
+            'url'        => env('APP_URL') . '/storage/doctors',
+            'visibility' => 'public',
+        ]
+
     ],
 
     /*

@@ -8,12 +8,10 @@ use Illuminate\Http\Request;
 
 class DoctorController extends Controller
 {
-    protected IDoctor $doctorRepository;
+    
 
-    public function __construct(IDoctor $doctorRepository)
-    {
-        $this->doctorRepository = $doctorRepository;
-    }
+    public function __construct(private readonly IDoctor $doctorRepo )
+    {}
     /**
      * Display a listing of the resource.
      */
