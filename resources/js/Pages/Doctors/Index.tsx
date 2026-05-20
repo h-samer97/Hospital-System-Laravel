@@ -1,10 +1,11 @@
-import { Doctor, Section, Image } from "./types";
+import { Doctor, Section, Image, Appointment } from "./types";
 import { useState } from "react";
 import styles from "./Index.module.css";
-import AddDoctor from "./AddDoctor";
 import DoctorFormModal from "./DoctorFormModal";
 // import DeleteModal from "../Components/UI/DeleteModal";
 import DeleteModal from "@/Components/UI/DeleteModal";
+import UpdatePasswordModal from './UpdatePasswordModal';
+import UpdateStatusModal from './UpdateStatusModal';
 
 // TODO => FIX DOCTORS
 
@@ -12,15 +13,18 @@ interface Props {
     doctors: Doctor[]; // Doctor[] doctors = [{}, {}, {}]
     sections: Section[];
     images: Image[];
+    appointments: Appointment[];
     store_url: string;
 }
 
-export default function Index({ doctors, sections, images, store_url }: Props) {
+export default function Index({ doctors, sections, images, appointments, store_url }: Props) {
     
     const [showAdd, setShowAdd]             = useState(false);
     const [editDoctor, setEditDoctor]       = useState<Doctor | null>(null);
     const [deleteDoctor, setDeleteDoctor]   = useState<Doctor | null>(null);
     const [search, setSearch]               = useState('');
+    const [passwordDoctor, setPasswordDoctor] = useState<Doctor | null>(null);
+    const [statusDoctor, setStatusDoctor]     = useState<Doctor | null>(null);
 
     const filteredDoctors = doctors.filter(doctor => doctor.name.includes(search)
                                                   || doctor.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
@@ -118,14 +122,34 @@ export default function Index({ doctors, sections, images, store_url }: Props) {
             </div>
 
             {showAdd && (
-                <AddDoctor sections={sections} images={images} onClose={() => setShowAdd(false)} store_url={store_url}/>
+                <DoctorFormModal
+                  mode="add"
+                  sections={sections}
+                  appointments={appointments}
+                  storeUrl={store_url}
+                  onClose={() => setShowAdd(false)}
+                />
             )}
+
+{passwordDoctor && (
+  <UpdatePasswordModal
+    doctor={passwordDoctor}
+    onClose={() => setPasswordDoctor(null)}
+  />
+)}
+{statusDoctor && (
+  <UpdateStatusModal
+    doctor={statusDoctor}
+    onClose={() => setStatusDoctor(null)}
+  />
+)}
 
             {editDoctor && (
                 <DoctorFormModal
                   mode="edit"
                   doctor={editDoctor}
                   sections={sections}
+                  appointments={appointments}
                   storeUrl={editDoctor.edit_url}
                   onClose={() => setEditDoctor(null)}
                 />

@@ -24,15 +24,24 @@ trait ImageUploadService
 
     public function Delete(Model $model, string $disk = 'doctors') {
         if($model->image) {
-            $model->image()->delete();  
-            Storage::disk($disk)->delete($model->image->path);
+            if ($model->image->path) {
+                Storage::disk($disk)->delete($model->image->path);
+            }
+            $model->image()->delete();
         } 
     }
 
     public function getUrl(Model $model, string $disk = 'doctors') : array {
+        if (!$model->image) {
+            return [
+                'url' => null,
+                'file' => null,
+            ];
+        }
+
         return [
-            'url' => Storage::disk($disk)->url($model->image->path),
-            'file' => asset('storage/' . $model->image->path),
+            'url' => Storage::disk($disk)->url($model->image->filename),
+            'file' => asset('storage/' . $model->image->filename),
         ];
     }
 

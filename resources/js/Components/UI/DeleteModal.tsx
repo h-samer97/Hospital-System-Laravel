@@ -15,18 +15,18 @@ export default function DeleteModal({ name, deleteUrl, onClose }: Props) {
     <div className={styles.overlay} onClick={onClose}>
       <div className={`${styles.modal} ${styles.deleteModal}`} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
-          <h2>تأكيد الحذف</h2>
+          <h2>Confirm Delete</h2>
           <button className={styles.closeBtn} onClick={onClose}>✕</button>
         </div>
         <div className={styles.modalBody}>
-          <p>هل أنت متأكد من حذف <strong>"{name}"</strong>؟</p>
-          <p className={styles.deleteNote}>⚠️ لا يمكن التراجع عن هذا الإجراء.</p>
+          <p>Are you sure you want to delete <strong>"{name}"</strong>?</p>
+          <p className={styles.deleteNote}>⚠️ This action cannot be undone.</p>
         </div>
         <div className={styles.modalFooter}>
-          <button className={styles.cancelBtn} onClick={onClose}>إلغاء</button>
+          <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
           <button className={styles.dangerBtn} disabled={processing}
             onClick={() => destroy(deleteUrl, { onSuccess: onClose })}>
-            {processing ? 'جاري الحذف...' : 'نعم، احذف'}
+            {processing ? 'Deleting...' : 'Yes, Delete'}
           </button>
         </div>
       </div>

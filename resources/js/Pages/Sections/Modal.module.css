@@ -12,7 +12,7 @@
   width: 100%; max-width: 480px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.2);
   animation: slideUp 0.25s ease;
-  direction: rtl;
+  direction: ltr;
 }
 
 .deleteModal { max-width: 400px; }

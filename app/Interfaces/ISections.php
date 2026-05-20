@@ -17,4 +17,6 @@ interface ISections
     public function update(UpdateSectionRequest $request, Section $section): RedirectResponse;
 
     public function destroy(Section $section): RedirectResponse;
+
+    public function show(Section $section): RedirectResponse;
 }

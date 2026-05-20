@@ -14,6 +14,37 @@ class SectionTableSeeder extends Seeder
     public function run(): void
     {
         if(Section::count() > 0) return;
-        Section::factory()->count(10)->create();
+        Section::factory()->create([
+            'name' => 'طوارئ',
+            'is_active' => true,
+        ]);
+        Section::factory()->create([
+            'name' => 'باطنة',
+            'is_active' => true,
+        ]);
+        Section::factory()->create([
+            'name' => 'جراحة',
+            'is_active' => true,
+        ]);
+        Section::factory()->create([
+            'name' => 'أطفال',
+            'is_active' => true,
+        ]);
+        Section::factory()->create([
+            'name' => 'عيون',
+            'is_active' => true,
+        ]);
+        Section::factory()->create([
+            'name' => 'نساء وتوليد',
+            'is_active' => true,
+        ]);
+        Section::factory()->create([
+            'name' => 'عظام',
+            'is_active' => true,
+        ]);
+        Section::factory()->create([
+            'name' => 'أسنان',
+            'is_active' => true,
+        ]);
     }
 }

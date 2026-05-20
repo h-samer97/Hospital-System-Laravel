@@ -1,6 +1,6 @@
 .page {
     padding: 24px;
-    direction: rtl;
+    direction: ltr;
 }
 
 .header {
@@ -94,7 +94,7 @@
 
 .table th {
     padding: 16px;
-    text-align: right;
+    text-align: left;
     font-size: 13px;
     font-weight: 600;
     color: #374151;

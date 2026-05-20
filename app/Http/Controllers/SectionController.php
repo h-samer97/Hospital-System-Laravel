@@ -38,4 +38,9 @@ class SectionController extends Controller implements ISections
     {
         return $this->sectionsRepository->destroy($section);
     }
+
+    public function show(Section $section) : RedirectResponse
+    {
+        return $this->sectionsRepository->show($section);
+    }
 }

@@ -11,20 +11,20 @@ interface Props {
 }
 
 const stats = [
-    { label: 'إجمالي الأطباء',  value: '48',  icon: '👨‍⚕️', color: '#4299e1' },
-    { label: 'المرضى اليوم',    value: '126', icon: '🧑‍🤝‍🧑', color: '#48bb78' },
-    { label: 'المواعيد القادمة', value: '34',  icon: '📅', color: '#ed8936' },
-    { label: 'الأقسام',         value: '12',  icon: '🏥', color: '#9f7aea' },
+    { label: 'Total Doctors',  value: '48',  icon: '👨‍⚕️', color: '#4299e1' },
+    { label: 'Patients Today',    value: '126', icon: '🧑‍🤝‍🧑', color: '#48bb78' },
+    { label: 'Upcoming Appointments', value: '34',  icon: '📅', color: '#ed8936' },
+    { label: 'Sections',         value: '12',  icon: '🏥', color: '#9f7aea' },
 ];
 
 export default function DashboardIndex({ admin }: Props) {
     return (
-        <DashboardLayout title="الرئيسية">
+        <DashboardLayout title="Dashboard">
             <div className={styles.dashboardPage}>
                 <div className={styles.welcomeBanner}>
                     <div>
-                        <h2>مرحباً، {admin.name} 👋</h2>
-                        <p>إليك ملخص النظام لهذا اليوم</p>
+                        <h2>Hello, {admin.name} 👋</h2>
+                        <p>Here's your system summary for today</p>
                     </div>
                 </div>
 

@@ -14,19 +14,18 @@ class SectionFactory extends Factory
     public function definition(): array
     {
          $sections = [
-            ['ar' => 'طوارئ',        'en' => 'Emergency'],
-            ['ar' => 'باطنة',         'en' => 'Internal Medicine'],
-            ['ar' => 'جراحة',         'en' => 'Surgery'],
-            ['ar' => 'أطفال',         'en' => 'Pediatrics'],
-            ['ar' => 'عيون',          'en' => 'Ophthalmology'],
-            ['ar' => 'نساء وتوليد',   'en' => 'Gynecology'],
-            ['ar' => 'عظام',          'en' => 'Orthopedics'],
-            ['ar' => 'أسنان',         'en' => 'Dentistry'],
+            'طوارئ',
+            'باطنة',
+            'جراحة',
+            'أطفال',
+            'عيون',
+            'نساء وتوليد',
+            'عظام',
+            'أسنان',
         ];
 
-        $pick = $this->faker->unique()->randomElement($sections);
         return [
-            'name' => $pick,
+            'name' => $this->faker->randomElement($sections),
             'is_active' => true,
         ];
     }

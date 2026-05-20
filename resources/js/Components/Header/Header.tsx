@@ -1,6 +1,5 @@
 import { usePage } from '@inertiajs/react';
 import styles from './Header.module.css';
-import LanguageSwitcher from '@/Layouts/LanguageSwitcher';
 
 interface HeaderProps {
     title: string;
@@ -12,15 +11,15 @@ interface HeaderProps {
 export default function Header({ title, userType, links, onToggleSidebar }: HeaderProps) {
     const { url } = usePage();
 
-    const userLabel = userType === 'Admin' ? 'مشرف' : 'مستخدم';
-    const userInitial = userType === 'Admin' ? 'م' : 'U';
+    const userLabel = userType === 'Admin' ? 'Admin' : 'User';
+    const userInitial = userType === 'Admin' ? 'A' : 'U';
 
     return (
         <header className={styles.header}>
 
             <div className={styles.headerRight}>
                 {onToggleSidebar && (
-                    <button className={styles.toggleBtn} onClick={onToggleSidebar} aria-label="تبديل القائمة">
+                    <button className={styles.toggleBtn} onClick={onToggleSidebar} aria-label="Toggle menu">
                         ☰
                     </button>
                 )}
@@ -44,9 +43,7 @@ export default function Header({ title, userType, links, onToggleSidebar }: Head
                 )}
 
                 <div className={styles.divider} />
-LanguageSwitcher />
 
-                <
                 <div className={styles.userBadge}>
                     <div className={styles.userAvatar}>{userInitial}</div>
                     <span className={styles.userType}>{userLabel}</span>

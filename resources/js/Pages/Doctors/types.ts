@@ -11,6 +11,11 @@ export interface Section {
     name: string;
 }
 
+export interface Appointment {
+    id: number;
+    name: string;
+}
+
 export interface Doctor {
     id: number;
     section_id: number;
@@ -20,13 +25,24 @@ export interface Doctor {
     price: number | string | null;
     is_active: boolean;
     created_at: string;
-    appointments: string;
+    appointments: Appointment[];
     section: Section;
     image: Image | null;
     image_url: string | null;
     edit_url: string;
     delete_url: string;
     store_url: string;
+    update_password_url: string;
+    update_status_url: string; 
+}
+
+export interface UpdatePasswordForm {
+  password: string;
+  password_confirmation: string;
+}
+
+export interface UpdateStatusForm {
+  is_active: boolean;
 }
 
 export interface StoreDoctorRequest {
@@ -70,3 +86,13 @@ export interface DoctorFormData {
 }
 
 export type DoctorSection = Section;
+
+export const DAYS = [
+    'Saturday',
+    'Sunday',
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+] as const;

@@ -31,7 +31,7 @@ export default function Toast() {
   return (
     <div className={`${styles.toast} ${styles[flash.type]}`}>
       <span>{flash.message}</span>
-      <button onClick={() => setVisible(false)} aria-label="إغلاق">✕</button>
+      <button onClick={() => setVisible(false)} aria-label="Close">✕</button>
     </div>
   );
 }

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone');
-            $table->decimal('price', 8, 2);
+            # $table->decimal('price', 8, 2);
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();

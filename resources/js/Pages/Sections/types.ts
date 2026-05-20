@@ -3,6 +3,7 @@ export interface Section {
   name: string;
   name_ar: string;
   is_active: boolean;
+  description: string;
   created_at: string;
   updated_at?: string;
   deleted_at?: string | null;

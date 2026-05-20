@@ -15,7 +15,7 @@ class ImageFactory extends Factory
 
     public function definition(): array
     {
-        $doctor = Doctor::inRandomOrder();
+        $doctor = Doctor::inRandomOrder()->first();
 
         return [
              'filename'      => $this->faker->randomElement(['1.jpg','2.jpg','3.jpg','4.jpg']),

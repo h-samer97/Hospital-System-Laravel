@@ -23,8 +23,8 @@ export default function({sections}: Props) {
     );
 
      return (
-    <DashboardLayout title="إدارة الأقسام">
-      <Head title="إدارة الأقسام" />
+    <DashboardLayout title="Manage Sections">
+      <Head title="Manage Sections" />
       <Toast />
 
       <div className={styles.page}>
@@ -32,14 +32,14 @@ export default function({sections}: Props) {
         {/* Header */}
         <div className={styles.header}>
           <div>
-            <h1>📋 الأقسام</h1>
-            <p className={styles.breadcrumb}>لوحة التحكم / عرض الكل</p>
+            <h1>📋 Sections</h1>
+            <p className={styles.breadcrumb}>Dashboard / View All</p>
           </div>
           <button
             className={styles.addBtn}
             onClick={() => setShowAddModal(true)}
           >
-            ➕ إضافة قسم
+            ➕ Add Section
           </button>
         </div>
 
@@ -49,12 +49,12 @@ export default function({sections}: Props) {
           <div className={styles.toolbar}>
             <input
               type="text"
-              placeholder="بحث..."
+              placeholder="Search..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className={styles.searchInput}
             />
-            <span className={styles.count}>{filtered.length} قسم</span>
+            <span className={styles.count}>{filtered.length} sections</span>
           </div>
 
           <div className={styles.tableWrapper}>
@@ -62,16 +62,17 @@ export default function({sections}: Props) {
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>الاسم</th>
-                  <th>تاريخ الإضافة</th>
-                  <th>الإجراءات</th>
+                  <th>Name</th>
+                  <th>Description</th>
+                  <th>Date Added</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className={styles.empty}>
-                      لا توجد أقسام
+                    <td colSpan={5} className={styles.empty}>
+                      No sections found
                     </td>
                   </tr>
                 ) : (
@@ -79,19 +80,20 @@ export default function({sections}: Props) {
                     <tr key={section.id}>
                       <td>{index + 1}</td>
                       <td>{section.name}</td>
-                      <td>{new Date(section.created_at).toLocaleDateString('ar-EG')}</td>
+                      <td>{section.description}</td>
+                      <td>{new Date(section.created_at).toLocaleDateString('en-US')}</td>
                       <td className={styles.actions}>
                         <button
                           className={styles.editBtn}
                           onClick={() => setEditSection(section)}
-                          title="تعديل"
+                          title="Edit"
                         >
                           ✏️
                         </button>
                         <button
                           className={styles.deleteBtn}
                           onClick={() => setDeleteSection(section)}
-                          title="حذف"
+                          title="Delete"
                         >
                           🗑️
                         </button>

@@ -4,20 +4,20 @@
     min-height: 100vh;
     background-color: #f0f2f5;
     font-family: 'Tajawal', 'Segoe UI', sans-serif;
-    direction: rtl;
+    direction: ltr;
 }
 
 .dashboardMain {
     flex: 1;
     display: flex;
     flex-direction: column;
-    margin-right: 64px; /* عرض الـ sidebar المغلق */
-    transition: margin-right 0.3s ease;
+    margin-left: 64px; /* عرض الـ sidebar المغلق */
+    transition: margin-left 0.3s ease;
     min-height: 100vh;
 }
 
 .dashboardMainSidebarOpen {
-    margin-right: 260px; /* عرض الـ sidebar المفتوح */
+    margin-left: 260px; /* عرض الـ sidebar المفتوح */
 }
 
 .dashboardContent {
@@ -30,7 +30,7 @@
 .sidebar {
     position: fixed;
     top: 0;
-    right: 0;
+    left: 0;
     height: 100vh;
     width: 260px;
     background-color: #1a202c;
@@ -39,7 +39,7 @@
     transition: width 0.3s ease;
     z-index: 100;
     overflow: hidden;
-    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.15);
 }
 
 .sidebarClosed {
@@ -256,11 +256,11 @@
     }
 
     .dashboardMain {
-        margin-right: 64px;
+        margin-left: 64px;
     }
 
     .dashboardMainSidebarOpen {
-        margin-right: 64px;
+        margin-left: 64px;
     }
 
     .dashboardContent {

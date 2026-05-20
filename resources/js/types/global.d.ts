@@ -17,7 +17,7 @@ declare module '@inertiajs/core' {
     interface PageProps extends InertiaPageProps, AppPageProps {}
 }
 
-// تعريف الـ props المشتركة في كل الصفحات
+// Definition of shared props across all pages
 declare module '@inertiajs/react' {
   interface PageProps {
     auth: {

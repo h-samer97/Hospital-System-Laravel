@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\ISections;
 use App\Models\Section;
+use App\Models\Doctor;
 use Inertia\Inertia;
 use App\Http\Requests\dashboard\StoreSectionRequest;
 use App\Http\Requests\dashboard\UpdateSectionRequest;
@@ -22,6 +23,37 @@ class SectionsRepositories implements ISections  {
             'sections' => $sections
         ]);
     }
+
+
+    public function show(Section $section) : RedirectResponse {
+        
+        $section->doctor()
+        ->with(['image', 'appointments:id,name'])
+        ->select('id','section_id','name','email','phone','is_active','created_at')
+        ->get()
+        ->map(fn(Doctor $d) => [
+            'id'           => $d->id,
+            'name'         => $d->name,
+            'email'        => $d->email,
+            'phone'        => $d->phone,
+            'is_active'    => $d->is_active,
+            'created_at'   => $d->created_at,
+            'appointments' => $d->appointments->pluck('name')->join(', '),
+            'image_url'    => $this->imageService->url($d),
+            // URLs للعمليات
+            'update_password_url' => route('doctors.updatePassword', $d->id),
+            'update_status_url'   => route('doctors.updateStatus', $d->id),
+            'update_url'          => route('doctors.update', $d->id),
+            'delete_url'          => route('doctors.destroy', $d->id),
+        ]);
+
+        return Inertia::render('Sections/ShowDoctors', [
+            'section' => $section->only('id', 'name'),
+            'doctors' => $doctors,
+        ]);
+
+    }
+
 
     public function store(StoreSectionRequest $request): RedirectResponse {
         $sections = Section::create($request->validated());

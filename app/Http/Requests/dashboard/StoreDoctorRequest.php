@@ -30,7 +30,9 @@ class StoreDoctorRequest extends FormRequest
             'password' => ['required', 'string', 'min:8'],
             'is_active' => ['boolean'],
             'section_id' => ['required', 'integer', 'exists:sections,id'],
-            'appointments' => ['required', 'string'],
+            'appointment_ids'  => ['required', 'array', 'min:1'],
+            'appointment_ids.*'=> ['exists:appointments,id'],
+            'image'            => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048']
         ];
     }
 

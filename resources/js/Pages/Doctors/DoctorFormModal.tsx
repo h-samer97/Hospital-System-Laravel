@@ -1,27 +1,26 @@
 import React, { FormEvent } from 'react';
 import { useForm } from '@inertiajs/react';
-import type { Doctor, Section, DoctorFormData, DoctorSection } from './types';
+import type { Doctor, Section, DoctorFormData, DoctorSection, Appointment } from './types';
 import styles from './Modal.module.css';
-
-const DAYS = ['Saturday','Sunday','Monday','Tuesday','Wednesday','Thursday','Friday'];
 
 interface Props {
   mode: 'add' | 'edit';
   doctor?: Doctor;
   sections: DoctorSection[];
+  appointments: Appointment[];
   storeUrl: string;
   onClose: () => void;
 }
 
-export default function DoctorFormModal({ mode, doctor, sections, storeUrl, onClose }: Props) {
+export default function DoctorFormModal({ mode, doctor, sections, appointments, storeUrl, onClose }: Props) {
   const isEdit = mode === 'edit';
 
-  // useForm يدير الـ state والـ errors والـ submit
+  // useForm manages state, errors, and submit
   const { data, setData, post, put, processing, errors, reset } =
     useForm<DoctorFormData>({
       section_id:      doctor?.section?.id ?? '',
       name:            doctor?.name ?? '',
-      appointments:    doctor?.appointments ?? '',
+      appointment_ids: doctor?.appointments?.map(a => a.id) ?? [],
       email:           doctor?.email ?? '',
       password:        '',
       phone:           doctor?.phone ?? '',
@@ -34,9 +33,9 @@ export default function DoctorFormModal({ mode, doctor, sections, storeUrl, onCl
 
     const opts = { onSuccess: () => { reset(); onClose(); } };
 
-    // Inertia يقبل URL مباشرة — بدون Ziggy
+    // Inertia accepts URL directly — without Ziggy
     if (isEdit) {
-      // PUT — لكن مع رفع ملف نستخدم post + method spoofing
+      // PUT — but with file upload we use post + method spoofing
       post(storeUrl + '?_method=PUT', opts);
     } else {
       post(storeUrl, opts);
@@ -83,14 +82,27 @@ export default function DoctorFormModal({ mode, doctor, sections, storeUrl, onCl
 
             {/* Appointments */}
             <div className={styles.formGroup}>
-              <label>Appointment Day</label>
-              <select value={data.appointments}
-                onChange={(e) => setData('appointments', e.target.value)}
-                className={styles.input}>
-                <option value="">-- Select Day --</option>
-                {DAYS.map(d => <option key={d} value={d}>{d}</option>)}
-              </select>
-              {errors.appointments && <span className={styles.errorMsg}>{errors.appointments}</span>}
+              <label>Appointment Days</label>
+              <div className={styles.checkboxGroup}>
+                {appointments.map(appointment => (
+                  <label key={appointment.id} className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      value={appointment.id}
+                      checked={data.appointment_ids.includes(appointment.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setData('appointment_ids', [...data.appointment_ids, Number(e.target.value)]);
+                        } else {
+                          setData('appointment_ids', data.appointment_ids.filter(id => id !== Number(e.target.value)));
+                        }
+                      }}
+                    />
+                    {appointment.name}
+                  </label>
+                ))}
+              </div>
+              {errors.appointment_ids && <span className={styles.errorMsg}>{errors.appointment_ids}</span>}
             </div>
 
             {/* Email and Phone */}

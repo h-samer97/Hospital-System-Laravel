@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Database\Seeders\ServiceTableSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -14,9 +16,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminSeeder::class,
+            AppointmentTableSeeder::class,
             SectionTableSeeder::class,
             DoctorTableSeeder::class,
             ImageTableSeeder::class,
+            ServiceTableSeeder::class,
         ]);
         
 

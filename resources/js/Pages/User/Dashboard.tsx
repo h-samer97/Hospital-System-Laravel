@@ -22,8 +22,9 @@ export default function Dashboard({ children, title = 'لوحة التحكم' }:
                     onToggleSidebar={() => setSidebarOpen(prev => !prev)}
                     links={[
                         { label: 'الرئيسية',      href: '/' },
-                        { label: 'الملف الشخصي',  href: '/profile' },
-                        { label: 'الإعدادات',      href: '/settings' },
+                        { label: 'الأقسام',       href: '/sections' },
+                        { label: 'الأطباء',       href: '/doctors' },
+                        { label: 'الخدمات',       href: '/services' },
                     ]}
                 />
                 <main className={styles.dashboardContent}>

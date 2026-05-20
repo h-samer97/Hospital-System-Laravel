@@ -8,7 +8,10 @@ use App\Models\Section;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use App\Models\Image;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use App\Models\Appointment;
 
 class Doctor extends Model
 {
@@ -39,9 +42,14 @@ class Doctor extends Model
     {
         return $this->belongsTo(Section::class);
     }
-    public function image() : morphOne
+    public function image() : MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
+    }
+
+    public function appointments() : BelongsToMany
+    {
+        return $this->belongsToMany(Appointment::class);
     }
 
 }
