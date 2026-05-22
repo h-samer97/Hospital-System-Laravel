@@ -17,8 +17,7 @@ class ServiceRepository implements IService
         ->select('id', 'name', 'description', 'price', 'is_active', 'created_at')
         ->latest()
         ->get()
-        ->map(function(Service $service) {
-            return [
+        ->map(fn(Service $service) => [
                 'id' => $service->id,
                 'name' => $service->name,
                 'description' => $service->description,
@@ -29,8 +28,8 @@ class ServiceRepository implements IService
                 'url_store' => route('services.store'),
                 'url_update' => route('services.update', $service->id),
                 'url_delete' => route('services.destroy', $service->id),
-            ];
-        });
+            ]
+        );
 
         return inertia('Services/Index', [
             'services' => $services,

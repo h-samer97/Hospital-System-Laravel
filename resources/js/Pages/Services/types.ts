@@ -4,7 +4,7 @@ export interface Services {
     description: string | null;
     price: string; // arrived string form php
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
     is_active: boolean;
     // URLs
     url_store: string;

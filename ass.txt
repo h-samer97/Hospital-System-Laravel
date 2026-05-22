@@ -1,0 +1,430 @@
+<?php
+
+namespace App\Repositories;
+
+use App\Interfaces\IGroups;
+use Inertia\Inertia;
+use Inertia\Response;
+use Illuminate\Http\RedirectResponse;
+use App\Models\Group;
+use App\Models\Service;
+use App\Http\Requests\StoreGroupsRequest;
+use Exception;
+
+class GroupsRepository implements IGroups
+{
+    public function index() : Response {
+
+
+        # find(n) => get one record
+        # get() => get All Collection
+        $groups = Group::with(['services'])
+        ->select('id','name','notes','subtotal','discount','tax_percent','total','is_active','created_at')
+        ->latest() # DASC
+        ->get()
+        ->map(fn(Groups $group) => [
+            'id' => $group->id,
+            'name'        => $group->name,
+            'notes'       => $group->notes,
+            'subtotal'    => $group->subtotal,
+            'discount'    => $group->discount,
+            'tax_percent' => $group->tax_percent,
+            'total'       => $group->total,
+            'is_active'   => $group->is_active,
+            'created_at'  => $group->created_at,
+            'services'    => $group->services->map(fn($service) => [
+                    'id'         => $service->id,
+                    'name'       => $service->name,
+                    'quantity'   => $service->pivot->quantity,
+                    'unit_price' => $service->pivot->unit_price,
+            ]),
+            'urls'      => [
+                'store' => route('groups.store'),
+                'update' => route('groups.update', ['group' => $group->id]),
+                'destroy' => route('groups.destroy', ['group' => $group->id]),
+            ]
+        ]);
+
+        $services = Service::where('is_active', true)
+            ->select('id', 'name', 'price')
+            ->get();
+
+        return inertia::render('Groups/Index', [
+            'groups' => $groups,
+            'services' => $services,
+        ]);
+    }
+
+
+    public function store(StoreGroupsRequest $request) : RedirectResponse
+    {
+        try {
+            
+            $data = $request->validated();
+            $items    = $data['items'];
+            $discount = $data['discount'] ?? 0;
+            $tax      = $data['tax_percent'] ?? 17;
+
+
+            return redirect()->route('groups.index')->with('success', [
+                ''
+            ]);
+
+        } catch(Exception $error) {
+            return redirect()->route('groups.index')->with('error', $error->getMessage());
+        }
+    }
+
+    public function destroy(Group $group) : RedirectResponse
+    {
+        try {
+            $group->delete();
+            return redirect()->route('groups.index')->with('success', 'Group deleted successfully');
+        } catch(Exception $error) {
+            return redirect()->route('groups.index')->with('error', $error->getMessage());
+        }
+    }
+
+}.formCard {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07);
+  padding: 1.5rem; margin-bottom: 1.5rem;
+}
+.formTitle {
+  font-size: 1.1rem; font-weight: 700;
+  color: #1e293b; margin: 0 0 1.25rem;
+  padding-bottom: 0.75rem; border-bottom: 1px solid #f1f5f9;
+}
+
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem; }
+.formGroup { display: flex; flex-direction: column; gap: 0.4rem; }
+.formGroup label { font-size: 0.875rem; font-weight: 600; color: #374151; }
+
+.input, .select {
+  padding: 0.6rem 0.9rem; border: 1.5px solid #d1d5db;
+  border-radius: 8px; font-size: 0.9rem;
+  width: 100%; box-sizing: border-box;
+}
+.input:focus, .select:focus { outline: none; border-color: #6366f1; }
+.inputError { border-color: #ef4444; background: #fff5f5; }
+.errorMsg { font-size: 0.8rem; color: #ef4444; }
+
+/* جدول الصفوف الديناميكي */
+.tableWrapper { overflow-x: auto; margin: 1rem 0; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.table th {
+  text-align: left; padding: 0.7rem 0.85rem;
+  background: #f8fafc; font-weight: 600; color: #475569;
+  border-bottom: 1px solid #e2e8f0;
+}
+.table td {
+  padding: 0.6rem 0.85rem;
+  border-bottom: 1px solid #f1f5f9;
+  vertical-align: middle;
+}
+
+.rowSaved   { background: #f0fdf4; }
+.rowEditing { background: #fefce8; }
+
+.savedText  { font-weight: 500; color: #374151; }
+
+.qtyInput {
+  width: 70px; padding: 0.4rem 0.6rem;
+  border: 1.5px solid #d1d5db; border-radius: 6px;
+  font-size: 0.875rem;
+}
+
+.rowActions { display: flex; gap: 0.4rem; align-items: center; }
+
+.confirmBtn {
+  padding: 0.35rem 0.85rem; border: none; border-radius: 6px;
+  background: #d1fae5; color: #065f46;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+}
+.confirmBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+.confirmBtn:hover:not(:disabled) { background: #a7f3d0; }
+
+.editBtn {
+  padding: 0.35rem 0.85rem; border: none; border-radius: 6px;
+  background: #eff6ff; color: #3b82f6;
+  font-size: 0.8rem; font-weight: 600; cursor: pointer;
+}
+.editBtn:hover { background: #dbeafe; }
+
+.removeBtn {
+  border: none; background: none; cursor: pointer;
+  font-size: 1rem; padding: 0.3rem; border-radius: 6px;
+}
+.removeBtn:hover { background: #fff1f2; }
+
+.addRowBtn {
+  margin-top: 0.5rem; padding: 0.5rem 1rem;
+  border: 1.5px dashed #6366f1; border-radius: 8px;
+  background: none; color: #6366f1;
+  font-size: 0.875rem; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+}
+.addRowBtn:hover { background: #f5f3ff; }
+
+.rowError {
+  color: #b45309; background: #fef3c7;
+  border: 1px solid #fcd34d; border-radius: 8px;
+  padding: 0.6rem 1rem; font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+}
+
+/* Summary */
+.summary {
+  max-width: 340px; margin-left: auto;
+  border: 1px solid #e2e8f0; border-radius: 10px;
+  overflow: hidden; margin-top: 1rem;
+}
+.summaryRow {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.65rem 1rem; border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9rem; gap: 0.5rem;
+}
+.summaryRow:last-child { border-bottom: none; }
+.summaryInput {
+  width: 80px; padding: 0.3rem 0.5rem;
+  border: 1.5px solid #d1d5db; border-radius: 6px;
+  font-size: 0.875rem; text-align: right;
+}
+.totalRow {
+  background: #f5f3ff; font-weight: 700;
+  color: #4f46e5; font-size: 1rem;
+}
+
+/* Footer */
+.formFooter { display: flex; justify-content: flex-end; margin-top: 1.25rem; }
+.submitBtn {
+  padding: 0.7rem 2rem; background: #6366f1; color: #fff;
+  border: none; border-radius: 8px;
+  font-size: 0.95rem; font-weight: 600; cursor: pointer;
+}
+.submitBtn:hover    { background: #4f46e5; }
+.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }import React  from "react";
+import styles from "./GroupFormModal.module.css";
+import { Services } from "../Services/types";
+
+
+interface Props {
+    // onClose: () => void;
+    // onSuccess: () => void;
+    urlStore: string;
+    // service: Services[];
+}
+const GroupFormModal: React.FC<Props> = ({ urlStore }) => {
+
+    return <h1 className={styles.formTitle}>Group Form Modal , {urlStore}</h1>;
+
+};
+
+
+
+export default GroupFormModal;.page { padding: 1.5rem; }
+
+.header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 1.5rem;
+}
+.header h1 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin: 0; }
+.breadcrumb { font-size: 0.85rem; color: #94a3b8; margin-top: 0.25rem; }
+
+.addBtn {
+  background: #6366f1; color: #fff; border: none;
+  border-radius: 8px; padding: 0.65rem 1.25rem;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.addBtn:hover { background: #4f46e5; }
+
+.card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07); overflow: hidden;
+  margin-top: 1.5rem;
+}
+.tableWrapper { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.table thead tr { background: #f8fafc; }
+.table th {
+  text-align: left; padding: 0.85rem 1rem;
+  font-weight: 600; color: #475569;
+  border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+}
+.table td {
+  padding: 0.85rem 1rem; color: #374151;
+  border-bottom: 1px solid #f1f5f9; vertical-align: top;
+}
+.table tbody tr:hover { background: #fafafa; }
+
+.notes { font-size: 0.8rem; color: #94a3b8; margin: 0.25rem 0 0; }
+
+.serviceTag {
+  display: inline-block; background: #eff6ff;
+  color: #3b82f6; border-radius: 6px;
+  padding: 0.2rem 0.6rem; font-size: 0.8rem;
+  margin: 0.15rem; white-space: nowrap;
+}
+
+.total { font-weight: 700; color: #6366f1; }
+.empty { text-align: center; color: #94a3b8; padding: 2.5rem !important; }
+
+.deleteBtn {
+  border: none; background: none; cursor: pointer;
+  font-size: 1.1rem; padding: 0.3rem; border-radius: 6px;
+}
+.deleteBtn:hover { background: #fff1f2; }import React, { useState } from "react";
+import { Group, Service } from "./types";
+import Toast from "@/Components/UI/Toast";
+import styles from "./Index.module.css";
+import DashboardLayout from "@/Layouts/DashboardLayout";
+import { Head } from "@inertiajs/react";
+import GroupFormModal from "./GroupFormModal";
+
+interface Props {
+  groups: Group[];
+  services: Service[];
+}
+
+const GroupsIndex: React.FC<Props> = ({ groups, services }) => {
+
+    const [addForm, setAddForm] = useState<boolean>(false);
+    const [deleteGroup, setDeleteGroup] = useState<Group | null>(null);
+
+
+
+
+
+
+
+
+
+
+
+  return (
+  <DashboardLayout title="Group Services">
+    <Head title="Group Services" />
+    <Toast />
+    
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div>
+          <h1>Group Services</h1>
+          <p className={styles.breadcrumb}>Dashboard / Services / Groups</p>
+        </div>
+        <button className={styles.addBtn} onClick={() => setAddForm(!addForm)}>
+          + New Group
+        </button>
+      </div>
+
+     {addForm && <GroupFormModal urlStore={groups.urls.store}/>}
+     
+
+      {/* Table Section */}
+      <div className={styles.card}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Services</th>
+                <th>Subtotal</th>
+                <th>Discount</th>
+                <th>Tax %</th>
+                <th>Total</th>
+                <th>Added</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>
+                  <strong>Group Name</strong>
+                  <p className={styles.notes}>Notes go here</p>
+                </td>
+                <td>
+                  <span className={styles.serviceTag}>
+                    Service Name × 1
+                  </span>
+                </td>
+                <td>0 EGP</td>
+                <td>0 EGP</td>
+                <td>0%</td>
+                <td className={styles.total}>0 EGP</td>
+                <td>Time Ago</td>
+                <td>
+                  <button className={styles.deleteBtn}>🗑️</button>
+                </td>
+              </tr>
+              
+              {/* Empty State Example */}
+              {/* 
+              <tr>
+                <td colSpan={9} className={styles.empty}>No groups found</td>
+              </tr> 
+              */}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {/* Delete Modal Section */}
+    {/* <DeleteModal /> */}
+  </DashboardLayout>
+);
+};
+
+export default GroupsIndex;export interface GroupItem {
+  service_id: number | '';
+  quantity: number;
+  is_saved: boolean;
+  service_name: string;
+  unit_price: number;
+}
+
+export interface GroupURLs {
+  update: string;
+  delete: string;
+  store: string;
+}
+
+export interface Group {
+  id: number;
+  name: string;
+  notes: string | null;
+  subtotal: string;
+  discount: string;
+  tax_percent: string;
+  total: string;
+  is_active: boolean;
+  created_at: string;
+  services: {
+    id: number;
+    name: string;
+    quantity: number;
+    unit_price: string;
+  }[];
+  urls: GroupURLs;
+}
+export interface Service {
+    id: number;
+    name: string;
+    description: string | null;
+    price: string;
+    is_active: boolean;
+}
+
+export interface GroupFormData {
+  name: string;
+  notes: string;
+  discount: number;
+  tax_percent: number;
+  items: {
+    service_id: number;
+    quantity: number;
+  }[];
+}

@@ -7,6 +7,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Database\Seeders\ServiceTableSeeder;
+use Database\Seeders\GroupsTableSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,6 +22,7 @@ class DatabaseSeeder extends Seeder
             DoctorTableSeeder::class,
             ImageTableSeeder::class,
             ServiceTableSeeder::class,
+            GroupsTableSeeder::class
         ]);
         
 

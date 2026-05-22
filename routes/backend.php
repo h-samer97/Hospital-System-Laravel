@@ -8,7 +8,7 @@ use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\SectionController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ServiceController;
-use App\Http\Controller\GroupsController;
+use App\Http\Controllers\GroupController;
 
 // الصفحة الرئيسية
 Route::get('/', fn() => inertia('Welcome'))->name('home');

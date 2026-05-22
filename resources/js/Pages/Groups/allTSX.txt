@@ -1,0 +1,117 @@
+import React  from "react";
+import styles from "./GroupFormModal.module.css";
+import { Service } from "./types";
+
+
+interface Props {
+    // onClose: () => void;
+    // onSuccess: () => void;
+    
+    services: Service[];
+    urlStore: string;
+}
+const GroupFormModal: React.FC<Props> = ({ urlStore, services }) => {
+
+    return <h1 className={styles.formTitle}>Group Form Modal , {services[0]?.name}</h1>;
+
+};
+
+
+
+export default GroupFormModal;import React, { useState } from "react";
+import { Group, Service } from "./types";
+import Toast from "@/Components/UI/Toast";
+import styles from "./Index.module.css";
+import DashboardLayout from "@/Layouts/DashboardLayout";
+import { Head } from "@inertiajs/react";
+import GroupFormModal from "./GroupFormModal";
+
+interface Props {
+  groups: Group[];
+  services: Service[];
+  url_store: string;
+}
+
+const GroupsIndex: React.FC<Props> = ({ groups, url_store, services }) => {
+
+    const [addForm, setAddForm] = useState<boolean>(false);
+    const [deleteGroup, setDeleteGroup] = useState<Group | null>(null);
+
+
+  return (
+  <DashboardLayout title="Group Services">
+    <Head title="Group Services" />
+    <Toast />
+    
+    <div className={styles.page}>
+      <div className={styles.header}>
+        <div>
+          <h1>Group Services</h1>
+          <p className={styles.breadcrumb}>Dashboard / Services / Groups</p>
+        </div>
+        <button className={styles.addBtn} onClick={() => setAddForm(!addForm)}>
+          + New Group
+        </button>
+      </div>
+
+     {addForm && <GroupFormModal urlStore={url_store} services={services}/>}
+     
+
+      {/* Table Section */}
+      <div className={styles.card}>
+        <div className={styles.tableWrapper}>
+          <table className={styles.table}>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Services</th>
+                <th>Subtotal</th>
+                <th>Discount</th>
+                <th>Tax %</th>
+                <th>Total</th>
+                <th>Added</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>
+                  <strong>Group Name</strong>
+                  <p className={styles.notes}>Notes go here</p>
+                </td>
+                <td>
+                  <span className={styles.serviceTag}>
+                    Service Name × 1
+                  </span>
+                </td>
+                <td>0 EGP</td>
+                <td>0 EGP</td>
+                <td>0%</td>
+                <td className={styles.total}>0 EGP</td>
+                <td>Time Ago</td>
+                <td>
+                  <button className={styles.deleteBtn}>🗑️</button>
+                </td>
+              </tr>
+              
+              {/* Empty State Example */}
+              {/* 
+              <tr>
+                <td colSpan={9} className={styles.empty}>No groups found</td>
+              </tr> 
+              */}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    {/* Delete Modal Section */}
+    {/* <DeleteModal /> */}
+  </DashboardLayout>
+);
+};
+
+export default GroupsIndex;
