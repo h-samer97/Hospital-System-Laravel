@@ -13,76 +13,105 @@ use Exception;
 
 class GroupsRepository implements IGroups
 {
-    public function index() : Response {
+    public function index(): Response
+    {
+        $groups = Group::with('services')
+            ->select('id','name','notes','subtotal','discount','tax_percent','total','is_active','created_at')
+            ->latest()
+            ->get()
+            ->map(fn(Group $g) => [
+                'id'          => $g->id,
+                'name'        => $g->name,
+                'notes'       => $g->notes,
+                'subtotal'    => $g->subtotal,
+                'discount'    => $g->discount,
+                'tax_percent' => $g->tax_percent,
+                'total'       => $g->total,
+                'is_active'   => $g->is_active,
+                'created_at'  => $g->created_at,
+                // الخدمات المرتبطة بالمجموعة مع بيانات الـ pivot
+                'services'    => $g->services->map(fn($s) => [
+                    'id'         => $s->id,
+                    'name'       => $s->name,
+                    'quantity'   => $s->pivot->quantity,
+                    'unit_price' => $s->pivot->unit_price,
+                ]),
+                'delete_url'  => route('Groups.destroy', $g->id),
+            ]);
 
-
-        # find(n) => get one record
-        # get() => get All Collection
-        $groups = Group::with(['services'])
-        ->select('id','name','notes','subtotal','discount','tax_percent','total','is_active','created_at')
-        ->latest() # DASC
-        ->get()
-        ->map(fn(Group $group) => [
-            'id' => $group->id,
-            'name'        => $group->name,
-            'notes'       => $group->notes,
-            'subtotal'    => $group->subtotal,
-            'discount'    => $group->discount,
-            'tax_percent' => $group->tax_percent,
-            'total'       => $group->total,
-            'is_active'   => $group->is_active,
-            'created_at'  => $group->created_at,
-            'url_store'   => route('groups.store'),
-            'services'    => $group->services->map(fn($service) => [
-                    'id'         => $service->id,
-                    'name'       => $service->name,
-                    'quantity'   => $service->pivot->quantity,
-                    'unit_price' => $service->pivot->unit_price,
-            ]),
-            'urls'      => [
-                'destroy' => route('groups.destroy', $group->id),
-            ]
-        ]);
-
+        // كل الخدمات المتاحة للاختيار في الفورم
         $services = Service::where('is_active', true)
             ->select('id', 'name', 'price')
             ->get();
 
-        return inertia::render('Groups/Index', [
-            'groups' => $groups,
-            'services' => $services,
-            'url_store' => route('groups.store')
+        return Inertia::render('Dashboard/Groups/Index', [
+            'groups'    => $groups,
+            'services'  => $services,
+            'store_url' => route('Groups.store'),
         ]);
     }
 
-
-    public function store(StoreGroupsRequest $request) : RedirectResponse
+    // ============================================================
+    // store — حفظ المجموعة مع حساب الإجماليات
+    // ============================================================
+    public function store(StoreGroupRequest $request): RedirectResponse
     {
-        try {
-            
-            $data = $request->validated();
-            $items    = $data['items'];
-            $discount = $data['discount'] ?? 0;
-            $tax      = $data['tax_percent'] ?? 17;
+        $data     = $request->validated();
+        $items    = $data['items'];
+        $discount = $data['discount'] ?? 0;
+        $tax      = $data['tax_percent'] ?? 17;
 
+        // حساب الـ subtotal من الـ items
+        $subtotal = collect($items)->sum(function ($item) {
+            $service = Service::find($item['service_id']);
+            return $service->price * $item['quantity'];
+        });
 
-            return redirect()->route('groups.index')->with('success', [
-                ''
-            ]);
+        $afterDiscount = $subtotal - $discount;
+        $total         = $afterDiscount * (1 + $tax / 100);
 
-        } catch(Exception $error) {
-            return redirect()->route('groups.index')->with('error', $error->getMessage());
+        // إنشاء المجموعة
+        $group = Group::create([
+            'name'        => $data['name'],
+            'notes'       => $data['notes'] ?? null,
+            'subtotal'    => $subtotal,
+            'discount'    => $discount,
+            'tax_percent' => $tax,
+            'total'       => $total,
+        ]);
+
+        // ربط الخدمات بالمجموعة عبر الـ pivot
+        $syncData = [];
+        foreach ($items as $item) {
+            $service = Service::find($item['service_id']);
+            // نخزن unit_price وقت الحفظ لأن السعر قد يتغير
+            $syncData[$item['service_id']] = [
+                'quantity'   => $item['quantity'],
+                'unit_price' => $service->price,
+            ];
         }
+
+        $group->services()->sync($syncData);
+
+        return redirect()->route('Groups.index')->with('flash', [
+            'type'    => 'success',
+            'message' => 'Group created successfully',
+        ]);
     }
 
-    public function destroy(Group $group) : RedirectResponse
+    // ============================================================
+    // destroy
+    // ============================================================
+    public function destroy(Group $group): RedirectResponse
     {
-        try {
-            $group->delete();
-            return redirect()->route('groups.index')->with('success', 'Group deleted successfully');
-        } catch(Exception $error) {
-            return redirect()->route('groups.index')->with('error', $error->getMessage());
-        }
+        // detach قبل الحذف لتنظيف الـ pivot
+        $group->services()->detach();
+        $group->delete();
+
+        return redirect()->route('Groups.index')->with('flash', [
+            'type'    => 'success',
+            'message' => 'Group deleted successfully',
+        ]);
     }
 
 }
