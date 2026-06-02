@@ -33,16 +33,16 @@ export interface Doctor {
     delete_url: string;
     store_url: string;
     update_password_url: string;
-    update_status_url: string; 
+    update_status_url: string;
 }
 
 export interface UpdatePasswordForm {
-  password: string;
-  password_confirmation: string;
+    password: string;
+    password_confirmation: string;
 }
 
 export interface UpdateStatusForm {
-  is_active: boolean;
+    is_active: boolean;
 }
 
 export interface StoreDoctorRequest {
@@ -77,7 +77,7 @@ export interface ApiResponse {
 export interface DoctorFormData {
     section_id: string | number;
     name: string;
-    appointments: string;
+    appointment_ids: number[];
     email: string;
     password: string;
     phone: string;

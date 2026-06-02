@@ -9,6 +9,8 @@ use App\Http\Controllers\SectionController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\InsurancesController;
+use App\Http\Controllers\AmbulancesController;
 
 // الصفحة الرئيسية
 Route::get('/', fn() => inertia('Welcome'))->name('home');
@@ -17,7 +19,7 @@ Route::get('/', fn() => inertia('Welcome'))->name('home');
 Route::middleware('guest')->group(function () {
     Route::get('/login', fn() => inertia('Auth/Login'))->name('login');
     Route::get('/register', fn() => inertia('Auth/Register'))->name('register');
-    
+
     Route::get('/', function () {
         return Inertia::render('Auth/MultiLogin/MultiLoginPage');
     });
@@ -49,25 +51,30 @@ Route::middleware("auth:web")->group(function () {
 Route::middleware("auth:admins")->group(function () {
     Route::get('dashboard/admin', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
     Route::resource('sections', SectionController::class)
-    ->only(['index', 'store', 'update', 'destroy', 'show']);
+        ->only(['index', 'store', 'update', 'destroy', 'show']);
 
     # Doctors Routes
     Route::resource('doctors', DoctorController::class)
-    ->only(['index', 'store', 'update', 'destroy', 'edit', 'create']);
+        ->only(['index', 'store', 'update', 'destroy', 'edit', 'create']);
 
     Route::delete('doctors/bulk-destroy', [DoctorController::class, 'destroyBulk'])
         ->name('doctors.destroyBulk');
 
-        Route::patch('doctors/{doctor}/password', [DoctorController::class, 'updatePassword'])
+    Route::patch('doctors/{doctor}/password', [DoctorController::class, 'updatePassword'])
         ->name('Doctors.updatePassword');
 
     Route::patch('doctors/{doctor}/status', [DoctorController::class, 'updateStatus'])
         ->name('Doctors.updateStatus');
 
-        Route::resource('services', ServiceController::class)
+    Route::resource('services', ServiceController::class)
         ->only(['index', 'store', 'update', 'destroy']);
 
-        Route::resource('groups', GroupController::class)
+    Route::resource('groups', GroupController::class)
         ->only(['index', 'store', 'destroy']);
 
+    Route::resource('insurances', InsurancesController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
+
+    Route::resource('ambulances', AmbulancesController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 });

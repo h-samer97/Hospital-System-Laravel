@@ -1,0 +1,546 @@
+import { useForm } from '@inertiajs/react';
+import { FormEvent } from 'react';
+import type { Ambulance } from './types';
+import styles from './FormModal.module.css';
+
+type AmbulanceFormData = {
+  car_number:            string;
+  car_model:             string;
+  car_year_made:         string;
+  car_type:              'owned' | 'rental' | '';
+  driver_name:           string;
+  driver_license_number: string;
+  driver_phone:          string;
+  is_available:          boolean;
+  notes:                 string;
+};
+
+interface Props {
+  mode:       'add' | 'edit';
+  ambulance?: Ambulance | null;
+  url_store:  string;
+  onClose:    () => void;
+}
+
+const FormModal = ({ mode, onClose, ambulance, url_store }: Props) => {
+  const isEdit = mode === 'edit';
+
+  const { data, setData, errors, post, processing, reset, put } =
+    useForm<AmbulanceFormData>({
+      car_number:            ambulance?.car_number            ?? '',
+      car_model:             ambulance?.car_model             ?? '',
+      // ✅ car_year_made يُحوَّل لـ string لأن input يعمل مع string
+      car_year_made:         ambulance?.car_year_made?.toString() ?? '',
+      car_type:              ambulance?.car_type              ?? '',
+      driver_name:           ambulance?.driver_name           ?? '',
+      driver_license_number: ambulance?.driver_license_number ?? '',
+      driver_phone:          ambulance?.driver_phone          ?? '',
+      is_available:          ambulance?.is_available          ?? true,
+      notes:                 ambulance?.notes                 ?? '',
+    });
+
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const opts = { onSuccess: () => { reset(); onClose(); } };
+
+    isEdit
+      ? put(url_store, opts)
+      : post(url_store, opts);
+  };
+
+  return (
+    <div className={styles.overlay} onClick={onClose}>
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+
+        <div className={styles.header}>
+          <h2>{isEdit ? 'Edit Ambulance' : 'Add New Ambulance'}</h2>
+          <button className={styles.closeBtn} onClick={onClose}>✕</button>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <div className={styles.body}>
+
+            <div className={styles.row}>
+              <div className={styles.formGroup}>
+                <label>Car Number</label>
+                <input type="text"
+                  className={errors.car_number ? styles.inputError : styles.input}
+                  placeholder="e.g. AMB-001"
+                  value={data.car_number}
+                  onChange={(e) => setData('car_number', e.target.value)}
+                  autoFocus
+                />
+                {errors.car_number && <span className={styles.msgError}>{errors.car_number}</span>}
+              </div>
+              <div className={styles.formGroup}>
+                <label>Car Model</label>
+                <input type="text"
+                  className={errors.car_model ? styles.inputError : styles.input}
+                  placeholder="e.g. Toyota HiAce"
+                  value={data.car_model}
+                  onChange={(e) => setData('car_model', e.target.value)}
+                />
+                {errors.car_model && <span className={styles.msgError}>{errors.car_model}</span>}
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.formGroup}>
+                <label>Year Made</label>
+                <input type="number"
+                  className={errors.car_year_made ? styles.inputError : styles.input}
+                  min="1990" max={new Date().getFullYear()}
+                  placeholder="e.g. 2020"
+                  value={data.car_year_made}
+                  onChange={(e) => setData('car_year_made', e.target.value)}
+                />
+                {errors.car_year_made && <span className={styles.msgError}>{errors.car_year_made}</span>}
+              </div>
+              <div className={styles.formGroup}>
+                {/* ✅ car_type موجود في الـ migration */}
+                <label>Car Type</label>
+                <select
+                  className={errors.car_type ? styles.inputError : styles.input}
+                  value={data.car_type}
+                  onChange={(e) => setData('car_type', e.target.value as 'owned' | 'rental')}
+                >
+                  <option value="">-- Choose --</option>
+                  <option value="owned">🏥 Owned</option>
+                  <option value="rental">🚗 Rental</option>
+                </select>
+                {errors.car_type && <span className={styles.msgError}>{errors.car_type}</span>}
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.formGroup}>
+                <label>Driver Name</label>
+                <input type="text"
+                  className={errors.driver_name ? styles.inputError : styles.input}
+                  placeholder="Full name"
+                  value={data.driver_name}
+                  onChange={(e) => setData('driver_name', e.target.value)}
+                />
+                {errors.driver_name && <span className={styles.msgError}>{errors.driver_name}</span>}
+              </div>
+              <div className={styles.formGroup}>
+                <label>License Number</label>
+                <input type="text"
+                  className={errors.driver_license_number ? styles.inputError : styles.input}
+                  placeholder="e.g. DL-12345"
+                  value={data.driver_license_number}
+                  onChange={(e) => setData('driver_license_number', e.target.value)}
+                />
+                {errors.driver_license_number && <span className={styles.msgError}>{errors.driver_license_number}</span>}
+              </div>
+            </div>
+
+            <div className={styles.row}>
+              <div className={styles.formGroup}>
+                <label>Driver Phone</label>
+                <input type="text"
+                  className={errors.driver_phone ? styles.inputError : styles.input}
+                  placeholder="e.g. 01012345678"
+                  value={data.driver_phone}
+                  onChange={(e) => setData('driver_phone', e.target.value)}
+                />
+                {errors.driver_phone && <span className={styles.msgError}>{errors.driver_phone}</span>}
+              </div>
+              <div className={styles.formGroup}>
+                <label>Availability</label>
+                <select
+                  className={styles.input}
+                  value={data.is_available ? '1' : '0'}
+                  onChange={(e) => setData('is_available', e.target.value === '1')}
+                >
+                  <option value="1">✅ Available</option>
+                  <option value="0">❌ Unavailable</option>
+                </select>
+              </div>
+            </div>
+
+            <div className={styles.formGroup}>
+              <label>Notes <small>(optional)</small></label>
+              <textarea
+                className={styles.input}
+                placeholder="Any additional notes..."
+                rows={3}
+                value={data.notes}
+                onChange={(e) => setData('notes', e.target.value)}
+              />
+            </div>
+
+          </div>
+
+          <div className={styles.footer}>
+            <button type="button" className={styles.cancelBtn} onClick={onClose}>
+              Cancel
+            </button>
+            <button type="submit" className={styles.submitBtn} disabled={processing}>
+              {processing ? 'Saving...' : isEdit ? 'Update' : 'Add'}
+            </button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  );
+};
+
+export default FormModal;.overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; animation: fadeIn 0.2s ease;
+}
+.modal {
+  background: #fff; border-radius: 14px;
+  width: 100%; max-width: 560px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+  animation: slideUp 0.25s ease; overflow: hidden;
+}
+.header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid #f1f5f9;
+}
+.header h2 { font-size: 1.1rem; font-weight: 700; color: #1e293b; margin: 0; }
+.closeBtn {
+  background: none; border: none; font-size: 1.1rem;
+  color: #94a3b8; cursor: pointer; padding: 0.25rem;
+  transition: color 0.15s;
+}
+.closeBtn:hover { color: #374151; }
+
+.body { padding: 1.5rem; }
+
+.row {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin-bottom: 0;
+}
+@media (max-width: 520px) { .row { grid-template-columns: 1fr; } }
+
+.formGroup {
+  display: flex; flex-direction: column;
+  gap: 0.4rem; margin-bottom: 1rem;
+}
+.formGroup label { font-size: 0.875rem; font-weight: 600; color: #374151; }
+.formGroup small { font-weight: 400; color: #94a3b8; }
+
+.input, .inputError {
+  width: 100%; padding: 0.6rem 0.9rem;
+  border-radius: 8px; font-size: 0.9rem;
+  box-sizing: border-box; transition: border-color 0.2s;
+  background: #fff; font-family: inherit;
+}
+.input      { border: 1.5px solid #d1d5db; color: #111827; }
+.inputError { border: 1.5px solid #ef4444; background: #fff5f5; }
+.input:focus      { outline: none; border-color: #6366f1; }
+.inputError:focus { outline: none; }
+textarea.input    { resize: vertical; min-height: 80px; }
+
+.errorMsg { font-size: 0.8rem; color: #ef4444; }
+
+.footer {
+  display: flex; justify-content: flex-end; gap: 0.75rem;
+  padding: 1rem 1.5rem; border-top: 1px solid #f1f5f9;
+}
+.cancelBtn {
+  padding: 0.6rem 1.25rem; border: 1.5px solid #d1d5db;
+  border-radius: 8px; background: #fff; color: #374151;
+  font-size: 0.9rem; cursor: pointer;
+}
+.cancelBtn:hover { background: #f8fafc; }
+.submitBtn {
+  padding: 0.6rem 1.25rem; border: none;
+  border-radius: 8px; background: #6366f1; color: #fff;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+}
+.submitBtn:hover    { background: #4f46e5; }
+.submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}.page { padding: 1.5rem; }
+
+.header {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 1.5rem;
+}
+.header h1 { font-size: 1.5rem; font-weight: 700; color: #1e293b; margin: 0; }
+.breadcrumb { font-size: 0.85rem; color: #94a3b8; margin-top: 0.25rem; }
+
+.addBtn {
+  background: #6366f1; color: #fff; border: none;
+  border-radius: 8px; padding: 0.65rem 1.25rem;
+  font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  transition: background 0.2s;
+}
+.addBtn:hover { background: #4f46e5; }
+
+.card {
+  background: #fff; border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(0,0,0,0.07); overflow: hidden;
+}
+.toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 1rem 1.25rem; border-bottom: 1px solid #f1f5f9;
+}
+.searchInput {
+  padding: 0.5rem 0.85rem; border: 1.5px solid #e2e8f0;
+  border-radius: 8px; font-size: 0.9rem; min-width: 280px;
+}
+.searchInput:focus { outline: none; border-color: #6366f1; }
+.count { font-size: 0.85rem; color: #94a3b8; }
+
+.tableWrapper { overflow-x: auto; }
+.table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.table thead tr { background: #f8fafc; }
+.table th {
+  text-align: left; padding: 0.85rem 1rem;
+  font-weight: 600; color: #475569;
+  border-bottom: 1px solid #e2e8f0; white-space: nowrap;
+}
+.table td {
+  padding: 0.85rem 1rem; color: #374151;
+  border-bottom: 1px solid #f1f5f9; vertical-align: middle;
+}
+.table tbody tr:hover { background: #fafafa; }
+.table tbody tr:last-child td { border-bottom: none; }
+
+/* رقم السيارة */
+.carNumber {
+  font-family: monospace; font-weight: 600;
+  background: #f1f5f9; padding: 0.2rem 0.6rem;
+  border-radius: 4px; color: #334155;
+}
+
+/* Badges */
+.badgeOwned, .badgeRental,
+.badgeActive, .badgeInactive {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.25rem 0.75rem; border-radius: 99px;
+  font-size: 0.8rem; font-weight: 600; white-space: nowrap;
+}
+.badgeOwned    { background: #dbeafe; color: #1d4ed8; }
+.badgeRental   { background: #fef9c3; color: #854d0e; }
+.badgeActive   { background: #d1fae5; color: #065f46; }
+.badgeInactive { background: #fee2e2; color: #991b1b; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+.notes { max-width: 160px; color: #64748b; font-size: 0.85rem; }
+
+.actions { display: flex; gap: 0.5rem; }
+.editBtn, .deleteBtn {
+  border: none; background: none; cursor: pointer;
+  font-size: 1.1rem; padding: 0.3rem; border-radius: 6px;
+}
+.editBtn:hover   { background: #eff6ff; }
+.deleteBtn:hover { background: #fff1f2; }
+
+.empty { text-align: center; color: #94a3b8; padding: 2.5rem !important; }import { useState, type FC } from 'react';
+import { Head } from '@inertiajs/react';
+import DashboardLayout from '@/Layouts/DashboardLayout';
+import Toast from '@/Components/UI/Toast';
+import FormModal from './AmbulanceFormModal';
+import DeleteModal from '@/Components/UI/DeleteModal';
+import type { Ambulance, IndexProps } from './types';
+import styles from './Index.module.css';
+
+// ModalState — نمط موحد استخدمناه في كل الموديولات
+interface ModalState {
+  mode: 'add' | 'edit';
+  ambulance: Ambulance | null;
+}
+
+const AmbulancesIndex: FC<IndexProps> = ({ ambulances, store_url }) => {
+
+  // ✅ state واحد يتحكم في الـ modal (add/edit)
+  const [modal, setModal] = useState<ModalState | null>(null);
+  // ✅ ambulance محدد للحذف
+  const [deleteAmbulance, setDeleteAmbulance] = useState<Ambulance | null>(null);
+  const [search, setSearch] = useState('');
+
+  const filtered = ambulances.filter(a =>
+    a.driver_name.toLowerCase().includes(search.toLowerCase()) ||
+    a.car_number.toLowerCase().includes(search.toLowerCase()) ||
+    a.car_model.toLowerCase().includes(search.toLowerCase())
+  );
+
+  return (
+    <>
+      <Head title="Ambulances" />
+      <Toast />
+
+      <DashboardLayout title={''}>
+        <div className={styles.page}>
+
+          <div className={styles.header}>
+            <div>
+              <h1>Ambulances</h1>
+              <p className={styles.breadcrumb}>Dashboard / Ambulances</p>
+            </div>
+            {/* ✅ فتح modal الإضافة */}
+            <button
+              className={styles.addBtn}
+              onClick={() => setModal({ mode: 'add', ambulance: null })}
+            >
+              + Add Ambulance
+            </button>
+          </div>
+
+          <div className={styles.card}>
+            <div className={styles.toolbar}>
+              <input
+                type="text"
+                placeholder="Search by number, model or driver..."
+                className={styles.searchInput}
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+              <span className={styles.count}>{filtered.length} ambulances</span>
+            </div>
+
+            <div className={styles.tableWrapper}>
+              <table className={styles.table}>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Car Number</th>
+                    <th>Model</th>
+                    <th>Year</th>
+                    <th>Type</th>
+                    <th>Driver</th>
+                    <th>License No.</th>
+                    <th>Phone</th>
+                    <th>Availability</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.length === 0 ? (
+                    <tr>
+                      <td colSpan={11} className={styles.empty}>
+                        No ambulances found
+                      </td>
+                    </tr>
+                  ) : (
+                    filtered.map((ambulance, i) => (
+                      <tr key={ambulance.id}>
+                        <td>{i + 1}</td>
+                        <td>
+                          <span className={styles.carNumber}>
+                            {ambulance.car_number}
+                          </span>
+                        </td>
+                        <td>{ambulance.car_model}</td>
+                        {/* ✅ car_year_made رقم مباشر وليس Date */}
+                        <td>{ambulance.car_year_made}</td>
+                        <td>
+                          <span className={
+                            ambulance.car_type === 'owned'
+                              ? styles.badgeOwned
+                              : styles.badgeRental
+                          }>
+                            
+                          </span>
+                        </td>
+                        <td>{ambulance.driver_name}</td>
+                        <td>{ambulance.driver_license_number}</td>
+                        <td>{ambulance.driver_phone}</td>
+                        <td>
+                          <span className={
+                            ambulance.is_available
+                              ? styles.badgeActive
+                              : styles.badgeInactive
+                          }>
+                            <span className={styles.dot} />
+                            {ambulance.is_available ? 'Available' : 'Unavailable'}
+                          </span>
+                        </td>
+                        <td className={styles.notes}>
+                          {ambulance.notes?.slice(0, 30) ?? '—'}
+                        </td>
+                        <td className={styles.actions}>
+                          {/* ✅ يمرر الـ ambulance كاملاً */}
+                          <button
+                            className={styles.editBtn}
+                            onClick={() => setModal({ mode: 'edit', ambulance })}
+                          >
+                            ✏️
+                          </button>
+                          {/* ✅ يحفظ الـ ambulance المراد حذفه */}
+                          <button
+                            className={styles.deleteBtn}
+                            onClick={() => setDeleteAmbulance(ambulance)}
+                          >
+                            🗑️
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+        </div>
+      </DashboardLayout>
+
+      {/* ✅ modal واحد لـ add و edit */}
+      {modal && (
+        <FormModal
+          mode={modal.mode}
+          ambulance={modal.ambulance}
+          url_store={
+            modal.mode === 'add'
+              ? store_url                          // POST /ambulances
+              : modal.ambulance!.urls.update       // PUT /ambulances/{id}
+          }
+          onClose={() => setModal(null)}
+        />
+      )}
+
+      {/* ✅ deleteUrl من الـ ambulance نفسه وليس من المصفوفة */}
+      {deleteAmbulance && (
+        <DeleteModal
+          name={deleteAmbulance.car_number}
+          deleteUrl={deleteAmbulance.urls.destroy}  // ✅ destroy وليس delete
+          onClose={() => setDeleteAmbulance(null)}
+        />
+      )}
+
+    </>
+  );
+};
+
+export default AmbulancesIndex;// تعريف واحد فقط — أسماء متسقة مع Laravel
+export interface urls {
+  update:  string;   // route('ambulances.update', id)
+  destroy: string;   // route('ambulances.destroy', id)
+}
+
+export interface Ambulance {
+  id:                    number;
+  car_number:            string;
+  car_model:             string;
+  car_year_made:         number;
+  car_type:              'owned' | 'rental';
+//   car_type_label:        string;
+  driver_name:           string;
+  driver_license_number: string;
+  driver_phone:          string;
+  is_available:          boolean;
+  notes:                 string | null;
+  status:                boolean;
+  created_at:            string;
+  urls:                  urls;
+}
+
+export interface IndexProps {
+  ambulances: Ambulance[];
+  store_url:  string;   // ← منفصل — route('ambulances.store')
+}

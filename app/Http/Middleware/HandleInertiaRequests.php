@@ -19,13 +19,18 @@ class HandleInertiaRequests extends Middleware
                 'admin' => $request->user('admins'),
             ],
 
-            'flash' => $request->session()->get('flash'),
+            // 'flash' => $request->session()->get('flash'),
 
             // اللغة الحالية
             'locale' => App::getLocale(),
 
             // اتجاه الصفحة (يمكن تعديله حسب اللغة)
             'dir' => App::getLocale() === 'ar' ? 'rtl' : 'ltr',
+            
+            'flash' => [
+            'success' => fn () => $request->session()->get('success'),
+            'error'   => fn () => $request->session()->get('error'),
+        ],
 
         ]);
     }

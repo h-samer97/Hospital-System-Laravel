@@ -23,8 +23,8 @@ export default function DeleteModal({ name, deleteUrl, onClose }: Props) {
           <p className={styles.deleteNote}>⚠️ This action cannot be undone.</p>
         </div>
         <div className={styles.modalFooter}>
-          <button className={styles.cancelBtn} onClick={onClose}>Cancel</button>
-          <button className={styles.dangerBtn} disabled={processing}
+          <button type="button" className={styles.cancelBtn} onClick={onClose}>Cancel</button>
+          <button type="button" className={styles.dangerBtn} disabled={processing}
             onClick={() => destroy(deleteUrl, { onSuccess: onClose })}>
             {processing ? 'Deleting...' : 'Yes, Delete'}
           </button>

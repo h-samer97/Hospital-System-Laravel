@@ -22,9 +22,11 @@ class DatabaseSeeder extends Seeder
             DoctorTableSeeder::class,
             ImageTableSeeder::class,
             ServiceTableSeeder::class,
-            GroupsTableSeeder::class
+            GroupsTableSeeder::class,
+            InsurancesTableSeeder::class,
+            AmbulancesTableSeeder::class,
         ]);
-        
+
 
         User::factory()->create([
             'name' => 'user',

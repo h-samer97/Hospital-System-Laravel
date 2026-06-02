@@ -36,25 +36,25 @@ class GroupsRepository implements IGroups
                     'quantity'   => $s->pivot->quantity,
                     'unit_price' => $s->pivot->unit_price,
                 ]),
-                'delete_url'  => route('Groups.destroy', $g->id),
+                'delete_url'  => route('groups.destroy', $g->id),
             ]);
 
         // كل الخدمات المتاحة للاختيار في الفورم
-        $services = Service::where('is_active', true)
+        $services = Service::where('is_active', '=', true, true)
             ->select('id', 'name', 'price')
             ->get();
 
-        return Inertia::render('Dashboard/Groups/Index', [
+        return Inertia::render('Groups/Index', [
             'groups'    => $groups,
             'services'  => $services,
-            'store_url' => route('Groups.store'),
+            'store_url' => route('groups.store'),
         ]);
     }
 
     // ============================================================
     // store — حفظ المجموعة مع حساب الإجماليات
     // ============================================================
-    public function store(StoreGroupRequest $request): RedirectResponse
+    public function store(StoreGroupsRequest $request): RedirectResponse
     {
         $data     = $request->validated();
         $items    = $data['items'];
@@ -63,7 +63,7 @@ class GroupsRepository implements IGroups
 
         // حساب الـ subtotal من الـ items
         $subtotal = collect($items)->sum(function ($item) {
-            $service = Service::find($item['service_id']);
+            $service = Service::find($item['service_id'], 'service_id');
             return $service->price * $item['quantity'];
         });
 
@@ -83,7 +83,7 @@ class GroupsRepository implements IGroups
         // ربط الخدمات بالمجموعة عبر الـ pivot
         $syncData = [];
         foreach ($items as $item) {
-            $service = Service::find($item['service_id']);
+            $service = Service::find($item['service_id'], 'service_id');
             // نخزن unit_price وقت الحفظ لأن السعر قد يتغير
             $syncData[$item['service_id']] = [
                 'quantity'   => $item['quantity'],
@@ -93,7 +93,7 @@ class GroupsRepository implements IGroups
 
         $group->services()->sync($syncData);
 
-        return redirect()->route('Groups.index')->with('flash', [
+        return redirect()->route('groups.index')->with('flash', [
             'type'    => 'success',
             'message' => 'Group created successfully',
         ]);
@@ -108,7 +108,7 @@ class GroupsRepository implements IGroups
         $group->services()->detach();
         $group->delete();
 
-        return redirect()->route('Groups.index')->with('flash', [
+        return redirect()->route('groups.index')->with('flash', [
             'type'    => 'success',
             'message' => 'Group deleted successfully',
         ]);

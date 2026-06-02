@@ -11,7 +11,7 @@ class Appointment extends Model
     protected $fillable = ['name'];
 
 
-    public function doctor() : BeLongsMany {
+    public function doctor() : BelongsToMany {
         return $this->belongsToMany(Doctor::class);
     }
 
