@@ -11,10 +11,9 @@ interface Props {
 }
 
 const stats = [
-    { label: 'Total Doctors',  value: '48',  icon: '👨‍⚕️', color: '#4299e1' },
-    { label: 'Patients Today',    value: '126', icon: '🧑‍🤝‍🧑', color: '#48bb78' },
-    { label: 'Upcoming Appointments', value: '34',  icon: '📅', color: '#ed8936' },
-    { label: 'Sections',         value: '12',  icon: '🏥', color: '#9f7aea' },
+    { label: 'Total Doctors', value: '48', icon: '👨‍⚕️', color: '#4299e1' },
+    { label: 'Patients Today', value: '126', icon: '🧑‍🤝‍🧑', color: '#48bb78' },
+    { label: 'Upcoming Appointments', value: '34', icon: '📅', color: '#ed8936' },
 ];
 
 export default function DashboardIndex({ admin }: Props) {
@@ -31,8 +30,8 @@ export default function DashboardIndex({ admin }: Props) {
                 <div className={styles.statsGrid}>
                     {stats.map(stat => (
                         <div key={stat.label} className={styles.statCard}>
-                            <div 
-                                className={styles.statIcon} 
+                            <div
+                                className={styles.statIcon}
                                 style={{ background: stat.color + '20', color: stat.color }}
                             >
                                 {stat.icon}

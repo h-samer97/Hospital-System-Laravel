@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function DashboardLayout({ title, children }: Props) {
-    const [sidebarOpen, setSidebarOpen] = useState(true);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
     const { url } = usePage();
 
     return (

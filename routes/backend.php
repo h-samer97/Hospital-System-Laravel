@@ -9,6 +9,7 @@ use App\Http\Controllers\SectionController;
 use App\Http\Controllers\DoctorController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\GroupController;
+use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\InsurancesController;
 use App\Http\Controllers\AmbulancesController;
 
@@ -74,6 +75,9 @@ Route::middleware("auth:admins")->group(function () {
 
     Route::resource('insurances', InsurancesController::class)
         ->only(['index', 'store', 'update', 'destroy']);
+
+    Route::resource('patients', PatientsController::class)
+        ->only(['index', 'store', 'update', 'destroy', 'show']);
 
     Route::resource('ambulances', AmbulancesController::class)
         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);

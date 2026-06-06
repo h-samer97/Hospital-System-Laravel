@@ -3,14 +3,13 @@ import styles from './Sidebar.module.css';
 import { Home, Users, Calendar, Building2, Beaker, Pill, Settings, LogOut, Stethoscope } from 'lucide-react';
 
 const staticNavItems = [
-    { label: 'Dashboard',  icon: Home, href: '/dashboard/admin' },
-    { label: 'Doctors',   icon: Stethoscope, href: '/admin/doctors' },
-    { label: 'Patients',    icon: Users, href: '/admin/patients' },
-    { label: 'Appointments',  icon: Calendar, href: '/admin/appointments' },
-    { label: 'Sections',   icon: Building2, href: '/admin/sections' },
-    { label: 'Lab',   icon: Beaker, href: '/admin/lab' },
-    { label: 'Pharmacy',  icon: Pill, href: '/admin/pharmacy' },
-    { label: 'Settings', icon: Settings, href: '/admin/settings' },
+    { label: 'Dashboard', icon: Home, href: '/dashboard/admin' },
+    { label: 'Doctors', icon: Stethoscope, href: '/doctors' },
+    { label: 'Patients', icon: Users, href: '/patients' },
+    { label: 'Services', icon: Beaker, href: '/services' },
+    { label: 'Groups', icon: Building2, href: '/groups' },
+    { label: 'Insurances', icon: Pill, href: '/insurances' },
+    { label: 'Ambulances', icon: Building2, href: '/ambulances' },
 ];
 
 export default function Sidebar({ isOpen }: { isOpen: boolean }) {
@@ -46,8 +45,8 @@ export default function Sidebar({ isOpen }: { isOpen: boolean }) {
                         {sections.map((section: any) => (
                             <Link
                                 key={section.id}
-                                href={`/admin/sections/${section.id}`}
-                                className={`${styles.navItem} ${url.startsWith(`/admin/sections/${section.id}`) ? styles.navItemActive : ''}`}
+                                href={`/sections/${section.id}`}
+                                className={`${styles.navItem} ${url.startsWith(`/sections/${section.id}`) ? styles.navItemActive : ''}`}
                             >
                                 <Building2 className={styles.navIcon} size={18} />
                                 <span className={styles.navLabel}>{section.name}</span>

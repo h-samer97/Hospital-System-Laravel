@@ -1,11 +1,13 @@
 <?php
 
-
 namespace App\Repositories;
 
 use App\Interfaces\IPatients;
+use App\Http\Requests\StorePatientsRequest;
+use App\Http\Requests\UpdatePatientsRequest;
 use App\Models\Patients;
 use Exception;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Response as Response;
 use Inertia\Inertia;
 
@@ -14,7 +16,6 @@ class PatientsRepository implements IPatients
 
   public function index(): Response
   {
-
     $patients = Patients::query()
       ->select('id', 'name', 'email', 'password', 'birth_date', 'phone', 'gender', 'blood_group', 'address', 'created_at', 'updated_at')
       ->latest()
@@ -39,36 +40,72 @@ class PatientsRepository implements IPatients
 
     return Inertia::render('Patients/Index', [
       'patients' => $patients,
-      'url_store' => \route('patients.store'),
+      'url_store' => route('patients.store'),
     ]);
   }
 
   public function store(StorePatientsRequest $request): RedirectResponse
   {
     try {
+      Patients::create($request->validated());
 
-        Patients::create(
-          $request->validated()
-        );
-
-        return \redirect()->route('patients.index')->with('flash', [
-             'type'    => 'success',
-              'message' => 'Insurance added successfully',
-        ]);
-
-    } catch(Exception $error) {
-
-
-
+      return redirect()->route('patients.index')->with('flash', [
+        'type' => 'success',
+        'message' => 'Patient added successfully',
+      ]);
+    } catch (Exception $error) {
+      return redirect()->route('patients.index')->with('flash', [
+        'type' => 'error',
+        'message' => 'Failed to add patient: ' . $error->getMessage(),
+      ]);
     }
   }
 
-  public function update(UpdatePatientsRequest $request, Patients $patient): RedirectResponse {}
+  public function update(UpdatePatientsRequest $request, Patients $patient): RedirectResponse
+  {
+    try {
+      $patient->update($request->validated());
 
-  public function destroy(Patients $patient): RedirectResponse {}
+      return redirect()->route('patients.index')->with('flash', [
+        'type' => 'success',
+        'message' => 'Patient updated successfully',
+      ]);
+    } catch (Exception $error) {
+      return redirect()->route('patients.index')->with('flash', [
+        'type' => 'error',
+        'message' => 'Failed to update patient: ' . $error->getMessage(),
+      ]);
+    }
+  }
+
+  public function destroy(Patients $patient): RedirectResponse
+  {
+    try {
+      $patient->delete();
+
+      return redirect()->route('patients.index')->with('flash', [
+        'type' => 'success',
+        'message' => 'Patient deleted successfully',
+      ]);
+    } catch (Exception $error) {
+      return redirect()->route('patients.index')->with('flash', [
+        'type' => 'error',
+        'message' => 'Failed to delete patient: ' . $error->getMessage(),
+      ]);
+    }
+  }
 
   public function show(Patients $patient): Response
   {
-    // Implementation for showing a specific patient record
+    return Inertia::render('Patients/Show', [
+      'patient' => [
+        'id' => $patient->id,
+        'name' => $patient->name,
+        'email' => $patient->email,
+        'password' => $patient->password,
+        'birth_date' => $patient->birth_date,
+        'phone' => $patient->phone,
+      ],
+    ]);
   }
 }

@@ -18,16 +18,13 @@ return new class extends Migration
             $table->string('password');
             $table->date('birth_date');
             $table->string('phone')->unique();
-            $table->tinyInteger('gender');
+            $table->enum('gender', ['male', 'female']);
             $table->string('blood_group');
             $table->text('address');
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
         Schema::dropIfExists('patients');

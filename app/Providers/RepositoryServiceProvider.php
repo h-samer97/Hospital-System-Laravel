@@ -6,12 +6,14 @@ use App\Interfaces\IAmbulance;
 use App\Interfaces\IDoctor;
 use App\Interfaces\IGroups;
 use App\Interfaces\IInsurance;
+use App\Interfaces\IPatients;
 use App\Interfaces\IService;
 use App\Interfaces\ISections;
 use App\Repositories\AmbulancesRepository;
 use App\Repositories\DoctorRepository;
 use App\Repositories\GroupsRepository;
 use App\Repositories\InsuranceRepository;
+use App\Repositories\PatientsRepository;
 use App\Repositories\SectionsRepositories;
 use App\Repositories\ServiceRepository;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +30,7 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(IGroups::class, GroupsRepository::class);
         $this->app->bind(ISections::class, SectionsRepositories::class);
         $this->app->bind(IInsurance::class, InsuranceRepository::class);
+        $this->app->bind(IPatients::class, PatientsRepository::class);
         $this->app->bind(IAmbulance::class, AmbulancesRepository::class);
     }
 
