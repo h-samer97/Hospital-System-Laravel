@@ -6,6 +6,7 @@ use App\Interfaces\IPatients;
 use App\Http\Requests\StorePatientsRequest;
 use App\Http\Requests\UpdatePatientsRequest;
 use App\Models\Patients;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response as Response;
@@ -28,8 +29,11 @@ class PatientsRepository implements IPatients
         'birth_date' => $patient->birth_date,
         'phone' => $patient->phone,
         'gender' => $patient->gender,
+        'gender_label' => $patient->gender === 'male' ? 'Male' : 'Female',
+        'age' => $patient->birth_date ? Carbon::parse($patient->birth_date)->age : null,
         'blood_group' => $patient->blood_group,
         'address' => $patient->address,
+        'is_active' => true,
         'created_at' => $patient->created_at,
         'updated_at' => $patient->updated_at,
         'urls' => [

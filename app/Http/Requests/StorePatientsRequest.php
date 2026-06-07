@@ -23,7 +23,7 @@ class StorePatientsRequest extends FormRequest
             'password' => $this->isMethod('post') ? ['required', 'string', 'min:8'] : ['nullable', 'string', 'min:8'],
             'birth_date' => ['required', 'date', 'before:today'],
             'phone' => ['required', 'numeric'],
-            'gender' => ['required', 'in:1,2'],
+            'gender' => ['required', 'in:male,female'],
             'blood_group' => ['required', 'in:O-,O+,A-,A+,B-,B+,AB-,AB+'],
             'address' => ['required', 'string', 'max:500'],
         ];

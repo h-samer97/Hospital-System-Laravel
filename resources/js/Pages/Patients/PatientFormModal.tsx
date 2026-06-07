@@ -8,15 +8,15 @@ import { X as CloseIcon } from 'lucide-react';
 interface Props {
   mode: 'add' | 'edit';
   patient?: Patient;
-  url_store: string;
+  storeUrl: string;
   onClose: () => void;
 }
 
-const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
+const PatientFormModal = ({ mode, patient, storeUrl, onClose }: Props) => {
 
   const isEdit = mode === 'edit';
 
-  const { data, setData, processing, errors, post, put, reset } = useForm<PatientFormData>({
+  const { data, setData, processing, errors, post, reset } = useForm<PatientFormData>({
     name: patient?.name ?? '',
     email: patient?.email ?? '',
     password: '',
@@ -25,7 +25,6 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
     gender: patient?.gender ?? undefined,
     blood_group: patient?.blood_group ?? undefined,
     address: patient?.address ?? '',
-    is_active: patient?.is_active ?? true,
   });
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -38,9 +37,11 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
       }
     }
 
-    isEdit ?
-      put(url_store, opts) :
-      post(url_store, opts);
+    if (isEdit) {
+      post(`${storeUrl}?_method=PUT`, opts);
+    } else {
+      post(storeUrl, opts);
+    }
 
   }
 
@@ -56,13 +57,13 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
         <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
 
           <div className={styles.header}>
-            <h2>Add New Patient</h2>
-            <button className={styles.closeBtn} onClick={onClose}>
+            <h2>{isEdit ? 'Edit Patient' : 'Add New Patient'}</h2>
+            <button className={styles.closeBtn} onClick={onClose} type="button">
               <CloseIcon />
             </button>
           </div>
 
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} action={storeUrl} method="post">
             <div className={styles.body}>
 
               {/* Full Name */}
@@ -70,13 +71,17 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
                 <label>Full Name</label>
                 <input
                   type="text"
-                  className={styles.input}
+                  className={errors.name ? styles.inputError : styles.input}
                   placeholder="e.g. John Smith"
-                // onChange={(e) => }
+                  onChange={(e) => setData('name', e.target.value)}
+                  onBlur={handleTrimInputs('name')}
+                  value={data.name}
+                  autoFocus
                 />
-                {/* Example Error State */}
-                {/* <input type="text" className={styles.inputError} />
-          <span className={styles.errorMsg}>Error message here</span> */}
+
+                {errors.name && (
+                  <span className={styles.errorMsg}>{errors.name}</span>
+                )}
               </div>
 
               {/* Email + Phone Row */}
@@ -87,7 +92,14 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
                     type="email"
                     className={styles.input}
                     placeholder="patient@email.com"
+                    onChange={(e) => setData('email', e.target.value)}
+                    onBlur={handleTrimInputs('email')}
+                    value={data.email}
                   />
+                  {errors.email && (
+                    <span className={styles.errorMsg}>{errors.email}</span>
+                  )}
+
                 </div>
                 <div className={styles.formGroup}>
                   <label>Phone</label>
@@ -95,20 +107,37 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
                     type="text"
                     className={styles.input}
                     placeholder="e.g. 01012345678"
+                    onChange={(e) => {
+
+                      const val = e.target.value.replace(/[^0-9+\-\s]/g, ''); // Reverse the condition to allow only numbers, +, -, and spaces
+
+                      setData('phone', val);
+                    }}
+                    onBlur={handleTrimInputs('phone')}
+                    value={data.phone}
                   />
+                  {errors.phone && (
+                    <span className={styles.errorMsg}>{errors.phone}</span>
+                  )}
                 </div>
               </div>
 
               {/* Password */}
               <div className={styles.formGroup}>
                 <label>
-                  Password <small>(leave blank to keep current)</small>
+                  Password  {isEdit && <small> (leave blank to keep current)</small>}
                 </label>
                 <input
                   type="password"
                   className={styles.input}
-                  placeholder="Min 8 characters"
+                  placeholder={isEdit ? '••••••••' : 'Enter password'}
+                  onChange={(e) => setData('password', e.target.value)}
+                  onBlur={handleTrimInputs('password')}
+                  value={data.password}
                 />
+                {errors.password && (
+                  <span className={styles.errorMsg}>{errors.password}</span>
+                )}
               </div>
 
               {/* Date of Birth + Gender Row */}
@@ -119,11 +148,21 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
                     type="date"
                     max="2026-06-04"
                     className={styles.input}
+                    onChange={(e) => setData('birth_date', e.target.value)}
+                    value={data.birth_date}
                   />
+                  {errors.birth_date && (
+                    <span className={styles.errorMsg}>{errors.birth_date}</span>
+                  )}
                 </div>
+
                 <div className={styles.formGroup}>
                   <label>Gender</label>
-                  <select className={styles.input}>
+                  <select
+                    className={styles.input}
+                    onChange={(e) => setData('gender', e.target.value as PatientFormData['gender'])}
+                    value={data.gender ?? ''}
+                  >
                     <option value="">-- Choose --</option>
                     <option value="male">👨 Male</option>
                     <option value="female">👩 Female</option>
@@ -135,7 +174,11 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
               <div className={styles.row}>
                 <div className={styles.formGroup}>
                   <label>Blood Group</label>
-                  <select className={styles.input}>
+                  <select
+                    className={styles.input}
+                    onChange={(e) => setData('blood_group', e.target.value as PatientFormData['blood_group'])}
+                    value={data.blood_group ?? ''}
+                  >
                     <option value="">-- Choose --</option>
                     <option value="A+">A+</option>
                     <option value="A-">A-</option>
@@ -147,22 +190,19 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
                     <option value="O-">O-</option>
                   </select>
                 </div>
-                <div className={styles.formGroup}>
-                  <label>Status</label>
-                  <select className={styles.input}>
-                    <option value="1">✅ Active</option>
-                    <option value="0">❌ Inactive</option>
-                  </select>
-                </div>
               </div>
 
               {/* Address */}
               <div className={styles.formGroup}>
-                <label>Address <small>(optional)</small></label>
+                <label>Address</label>
                 <input
                   type="text"
                   className={styles.input}
                   placeholder="Full address..."
+                  onChange={(e) => setData('address', e.target.value)}
+                  onBlur={handleTrimInputs('address')}
+                  value={data.address}
+                  required
                 />
               </div>
 
@@ -172,10 +212,11 @@ const PatientFormModal = ({ mode, patient, url_store, onClose }: Props) => {
               <button type="button" className={styles.cancelBtn} onClick={onClose}>
                 Cancel
               </button>
-              <button type="submit" className={styles.submitBtn}>
+              <button type="submit" className={styles.submitBtn} disabled={processing}>
                 {mode === 'add' ? 'Add Patient' : 'Save Changes'}
               </button>
             </div>
+
           </form>
 
         </div>

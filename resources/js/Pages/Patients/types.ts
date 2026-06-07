@@ -8,8 +8,8 @@ interface Patient {
     gender: 'male' | 'female';
     gender_label: string;
     blood_group: BloodGroup['typeBlood'];
-    address?: string;
-    is_active: boolean;
+    address: string;
+    is_active?: boolean;
     urls: {
         update: string;
         destroy: string;
@@ -28,10 +28,9 @@ interface PatientFormData {
     password?: string;
     birth_date?: string;
     phone?: string;
-    gender?: 'male' | 'female';
+    gender?: 'male' | 'female' | string;
     blood_group?: BloodGroup['typeBlood'];
-    address?: string;
-    is_active: boolean;
+    address: string;
 }
 
 export default PatientFormData;
