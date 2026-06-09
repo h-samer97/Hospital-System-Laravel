@@ -12,6 +12,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\InsurancesController;
 use App\Http\Controllers\AmbulancesController;
+use App\Http\Controllers\SingleInvoicesController;
 
 // الصفحة الرئيسية
 Route::get('/', fn() => inertia('Welcome'))->name('home');
@@ -81,4 +82,7 @@ Route::middleware("auth:admins")->group(function () {
 
     Route::resource('ambulances', AmbulancesController::class)
         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
+
+    Route::resource('single_invoices', SingleInvoicesController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
 });
