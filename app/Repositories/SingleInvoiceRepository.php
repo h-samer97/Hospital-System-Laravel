@@ -11,17 +11,16 @@ use App\Models\SingleInvoices;
 use App\Services\InvoiceService;
 use App\Models\Service;
 use App\Http\Requests\StoreSingleInvoiceRequest;
+use App\Http\Requests\UpdateSingleInvoiceRequest;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
-use Override;
 
 class SingleInvoiceRepository implements ISingleInvoice
 {
 
   public function __construct(private readonly InvoiceService $invoiceService) {}
 
-  #[Override]
   public function index(): Response
   {
     $singleInvoices = SingleInvoices::with([
@@ -67,7 +66,7 @@ class SingleInvoiceRepository implements ISingleInvoice
         ],
       ]);
 
-    return Inertia::render('SingleInvoices', [
+    return Inertia::render('Invoices/Index', [
       'invoices'  => $singleInvoices,
       'store_url' => route('single_invoices.store'),
       'patients' => Patients::where('is_active', true)->select('name', 'id')->get(),
@@ -98,7 +97,7 @@ class SingleInvoiceRepository implements ISingleInvoice
     ]);
   }
 
-  public function update(StoreSingleInvoiceRequest $request, SingleInvoices $invoice): RedirectResponse
+  public function update(UpdateSingleInvoiceRequest $request, SingleInvoices $invoice): RedirectResponse
   {
     $this->invoiceService->update($invoice, $request->validated());
 

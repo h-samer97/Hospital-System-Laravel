@@ -1,0 +1,11 @@
+❌ Authentication + Authorization (Gates/Policies)
+❌ Unit Tests / Feature Tests
+❌ API Rate Limiting
+❌ Caching (Redis)
+❌ Queue Jobs (للعمليات الثقيلة)
+❌ Logging احترافي
+❌ Error Tracking (Sentry)
+❌ CI/CD Pipeline
+❌ Docker
+❌ Pagination حقيقية (من DB مش frontend)
+❌ N+1 Query detection

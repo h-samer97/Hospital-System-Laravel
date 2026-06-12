@@ -3,63 +3,38 @@
 namespace App\Http\Controllers;
 
 use App\Models\SingleInvoices;
-use Illuminate\Http\Request;
+use App\Interfaces\ISingleInvoice;
+use App\Http\Requests\StoreSingleInvoiceRequest;
+use App\Http\Requests\UpdateSingleInvoiceRequest;
+use Illuminate\Http\RedirectResponse;
+use Inertia\Response;
 
 class SingleInvoicesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function __construct(private readonly ISingleInvoice $singleInvoiceRepo) {}
+
+    public function index(): Response
     {
-        //
+        return $this->singleInvoiceRepo->index();
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(StoreSingleInvoiceRequest $request): RedirectResponse
     {
-        //
+        return $this->singleInvoiceRepo->store($request);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(UpdateSingleInvoiceRequest $request, SingleInvoices $invoice): RedirectResponse
     {
-        //
+        return $this->singleInvoiceRepo->update($request, $invoice);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(SingleInvoices $singleInvoices)
+    public function destroy(SingleInvoices $invoice): RedirectResponse
     {
-        //
+        return $this->singleInvoiceRepo->destroy($invoice);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(SingleInvoices $singleInvoices)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, SingleInvoices $singleInvoices)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(SingleInvoices $singleInvoices)
-    {
-        //
-    }
+    // keep other methods as no-op to satisfy resource controller
+    public function create() {}
+    public function show(SingleInvoices $invoice) {}
+    public function edit(SingleInvoices $invoice) {}
 }
