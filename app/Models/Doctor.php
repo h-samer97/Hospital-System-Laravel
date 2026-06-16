@@ -19,7 +19,6 @@ class Doctor extends Model
 
     protected $fillable = [
         'name',
-        'appointments',
         'email',
         'email_verified_at',
         'password',
@@ -38,18 +37,17 @@ class Doctor extends Model
         'is_active'         => 'boolean',
     ];
 
-    public function section() : BelongsTo
+    public function section(): BelongsTo
     {
         return $this->belongsTo(Section::class);
     }
-    public function image() : MorphOne
+    public function image(): MorphOne
     {
         return $this->morphOne(Image::class, 'imageable');
     }
 
-    public function appointments() : BelongsToMany
+    public function appointments(): BelongsToMany
     {
         return $this->belongsToMany(Appointment::class);
     }
-
 }

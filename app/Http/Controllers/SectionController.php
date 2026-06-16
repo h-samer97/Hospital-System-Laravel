@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Interfaces\ISections;
 use App\Repositories\SectionsRepositories;
-use App\Http\Requests\dashboard\StoreSectionRequest;
-use App\Http\Requests\dashboard\UpdateSectionRequest;
+use App\Http\Requests\Dashboard\StoreSectionRequest;
+use App\Http\Requests\Dashboard\UpdateSectionRequest;
 use App\Models\Section;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
@@ -39,7 +39,7 @@ class SectionController extends Controller implements ISections
         return $this->sectionsRepository->destroy($section);
     }
 
-    public function show(Section $section) : RedirectResponse
+    public function show(Section $section): RedirectResponse
     {
         return $this->sectionsRepository->show($section);
     }

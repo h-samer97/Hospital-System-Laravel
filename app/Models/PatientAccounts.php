@@ -35,4 +35,8 @@ class PatientAccounts extends Model
     {
         return $this->belongsTo(Patient::class);
     }
+
+    public function receipt() : BelongsTo {
+        return $this->belongsTo(ReceiptAccount::class, 'receipt_id');
+    }
 }

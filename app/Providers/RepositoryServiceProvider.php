@@ -10,6 +10,7 @@ use App\Interfaces\IPatients;
 use App\Interfaces\IService;
 use App\Interfaces\ISections;
 use App\Interfaces\ISingleInvoice;
+use App\Interfaces\IReceiptAccount;
 use App\Repositories\AmbulancesRepository;
 use App\Repositories\DoctorRepository;
 use App\Repositories\GroupsRepository;
@@ -18,7 +19,9 @@ use App\Repositories\PatientsRepository;
 use App\Repositories\SectionsRepositories;
 use App\Repositories\ServiceRepository;
 use App\Repositories\SingleInvoiceRepository;
+use App\Repositories\ReceiptAccountRepository;
 use App\Services\InvoiceService;
+use App\Services\ReceiptService;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider
@@ -35,7 +38,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(IInsurance::class, InsuranceRepository::class);
         $this->app->bind(IPatients::class, PatientsRepository::class);
         $this->app->bind(IAmbulance::class, AmbulancesRepository::class);
+        $this->app->bind(IReceiptAccount::class, ReceiptAccountRepository::class);
         $this->app->singleton(InvoiceService::class);
+        $this->app->singleton(ReceiptService::class);
         $this->app->bind(ISingleInvoice::class, SingleInvoiceRepository::class);
     }
 

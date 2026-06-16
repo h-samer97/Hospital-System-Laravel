@@ -75,6 +75,7 @@ export interface ApiResponse {
 }
 
 export interface DoctorFormData {
+    id?: number | string;
     section_id: string | number;
     name: string;
     appointment_ids: number[];

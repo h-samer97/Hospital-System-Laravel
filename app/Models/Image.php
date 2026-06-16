@@ -10,7 +10,7 @@ class Image extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'path',
+        'filename',
         'imageable_type',
         'imageable_id',
     ];
@@ -25,5 +25,4 @@ class Image extends Model
     {
         return asset('storage/doctors/' . $this->filename);
     }
-
 }

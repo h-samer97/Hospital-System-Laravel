@@ -15,7 +15,13 @@ return new class extends Migration
             $table->id();
             $table->date('date');
             $table->foreignId('single_invoice_id')
-                  ->constrained('single_invoices')->cascadeOnDelete();
+                ->constrained('single_invoices')->cascadeOnDelete();
+            // `receipts` table may be created after this migration; avoid adding
+            // the foreign key constraint here to prevent "foreign key
+            // constraint is incorrectly formed" errors. Define as nullable
+            // unsignedBigInteger and add constraint in a later migration if
+            // needed.
+            $table->unsignedBigInteger('receipt_id')->nullable();
             $table->decimal('debit',  10, 2)->default(0);
             $table->decimal('credit', 10, 2)->default(0);
             $table->string('notes')->nullable();
@@ -23,7 +29,7 @@ return new class extends Migration
         });
     }
 
-   
+
     public function down(): void
     {
         Schema::dropIfExists('fund_accounts');

@@ -12,23 +12,25 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('doctors', function (Blueprint $table) {
-            $table->id();                                        
-            $table->string('name');                   
-            $table->string('appointments');
+            $table->id();
+            $table->string('name');
+            // appointments are represented by a pivot table `appointment_doctor`
+            // remove the single-column storage and keep relation via pivot
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->string('phone');
-            # $table->decimal('price', 8, 2);
+            // price may be nullable; consolidated into the create migration
+            $table->decimal('price', 8, 2)->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
             $table->softDeletes();
-            
+
             # ======== Relationshops =========
 
             $table->foreignId('section_id')
-                  ->constrained()
-                  ->cascadeOnDelete();                     
+                ->constrained()
+                ->cascadeOnDelete();
         });
     }
 

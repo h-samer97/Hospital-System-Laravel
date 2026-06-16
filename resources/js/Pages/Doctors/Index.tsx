@@ -1,4 +1,4 @@
-import { Doctor, Section, Image, Appointment } from "./types";
+import { Doctor, Section, Appointment } from "./types";
 import { useState } from "react";
 import styles from "./Index.module.css";
 import DoctorFormModal from "./DoctorFormModal";
@@ -6,32 +6,37 @@ import DoctorFormModal from "./DoctorFormModal";
 import DeleteModal from "@/Components/UI/DeleteModal";
 import UpdatePasswordModal from './UpdatePasswordModal';
 import UpdateStatusModal from './UpdateStatusModal';
+import DashboardLayout from "@/Layouts/DashboardLayout";
+import { Head } from "@inertiajs/react";
+import Toast from "@/Components/UI/Toast";
 
 // TODO => FIX DOCTORS
 
 interface Props {
     doctors: Doctor[]; // Doctor[] doctors = [{}, {}, {}]
     sections: Section[];
-    images: Image[];
     appointments: Appointment[];
     store_url: string;
 }
 
-export default function Index({ doctors, sections, images, appointments, store_url }: Props) {
-    
-    const [showAdd, setShowAdd]             = useState(false);
-    const [editDoctor, setEditDoctor]       = useState<Doctor | null>(null);
-    const [deleteDoctor, setDeleteDoctor]   = useState<Doctor | null>(null);
-    const [search, setSearch]               = useState('');
+export default function Index({ doctors, sections, appointments, store_url }: Props) {
+
+    const [showAdd, setShowAdd] = useState(false);
+    const [editDoctor, setEditDoctor] = useState<Doctor | null>(null);
+    const [deleteDoctor, setDeleteDoctor] = useState<Doctor | null>(null);
+    const [search, setSearch] = useState('');
     const [passwordDoctor, setPasswordDoctor] = useState<Doctor | null>(null);
-    const [statusDoctor, setStatusDoctor]     = useState<Doctor | null>(null);
+    const [statusDoctor, setStatusDoctor] = useState<Doctor | null>(null);
 
     const filteredDoctors = doctors.filter(doctor => doctor.name.includes(search)
-                                                  || doctor.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
-                                                  || doctor.name.toLocaleUpperCase().includes(search.toLocaleUpperCase()));
+        || doctor.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())
+        || doctor.name.toLocaleUpperCase().includes(search.toLocaleUpperCase()));
 
     return (
         <>
+            <DashboardLayout title="Managment Doctors">
+                <Head title="Doctors" />
+                <Toast/>
             <div className={styles.page}>
                 <div className={styles.header}>
                     <div>
@@ -123,44 +128,45 @@ export default function Index({ doctors, sections, images, appointments, store_u
 
             {showAdd && (
                 <DoctorFormModal
-                  mode="add"
-                  sections={sections}
-                  appointments={appointments}
-                  storeUrl={store_url}
-                  onClose={() => setShowAdd(false)}
+                    mode="add"
+                    sections={sections}
+                    appointments={appointments}
+                    storeUrl={store_url}
+                    onClose={() => setShowAdd(false)}
                 />
             )}
 
-{passwordDoctor && (
-  <UpdatePasswordModal
-    doctor={passwordDoctor}
-    onClose={() => setPasswordDoctor(null)}
-  />
-)}
-{statusDoctor && (
-  <UpdateStatusModal
-    doctor={statusDoctor}
-    onClose={() => setStatusDoctor(null)}
-  />
-)}
+            {passwordDoctor && (
+                <UpdatePasswordModal
+                    doctor={passwordDoctor}
+                    onClose={() => setPasswordDoctor(null)}
+                />
+            )}
+            {statusDoctor && (
+                <UpdateStatusModal
+                    doctor={statusDoctor}
+                    onClose={() => setStatusDoctor(null)}
+                />
+            )}
 
             {editDoctor && (
                 <DoctorFormModal
-                  mode="edit"
-                  doctor={editDoctor}
-                  sections={sections}
-                  appointments={appointments}
-                  storeUrl={editDoctor.edit_url}
-                  onClose={() => setEditDoctor(null)}
+                    mode="edit"
+                    doctor={editDoctor}
+                    sections={sections}
+                    appointments={appointments}
+                    storeUrl={editDoctor.edit_url}
+                    onClose={() => setEditDoctor(null)}
                 />
             )}
             {deleteDoctor && (
                 <DeleteModal
-                  name={deleteDoctor.name}
-                  deleteUrl={deleteDoctor?.delete_url}
-                  onClose={() => setDeleteDoctor(null)}
+                    name={deleteDoctor.name}
+                    deleteUrl={deleteDoctor?.delete_url}
+                    onClose={() => setDeleteDoctor(null)}
                 />
             )}
+            </DashboardLayout>
         </>
     );
 }

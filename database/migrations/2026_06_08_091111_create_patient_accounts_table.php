@@ -12,12 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('patient_accounts', function (Blueprint $table) {
-             $table->id();
+            $table->id();
             $table->date('date');
             $table->foreignId('single_invoice_id')
-                  ->constrained('single_invoices')->cascadeOnDelete();
+                ->constrained('single_invoices')->cascadeOnDelete();
+            // `receipts` table may be created after this migration; avoid adding
+            // the foreign key constraint here. Use nullable unsignedBigInteger
+            // and add the FK in a dedicated migration if needed.
+            $table->unsignedBigInteger('receipt_id')->nullable();
             $table->foreignId('patient_id')
-                  ->constrained('patients')->cascadeOnDelete();
+                ->constrained('patients')->cascadeOnDelete();
             $table->decimal('debit',  10, 2)->default(0);
             $table->decimal('credit', 10, 2)->default(0);
             $table->string('notes')->nullable();

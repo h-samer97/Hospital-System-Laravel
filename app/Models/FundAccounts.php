@@ -28,4 +28,9 @@ class FundAccounts extends Model
     {
         return $this->belongsTo(SingleInvoice::class, 'single_invoice_id');
     }
+
+    public function receipt() : BelongsTo {
+        return $this->belongsTo(ReceiptAccount::class, 'receipt_id');
+    }
+    
 }

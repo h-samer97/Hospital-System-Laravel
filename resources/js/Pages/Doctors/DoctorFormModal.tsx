@@ -18,25 +18,40 @@ export default function DoctorFormModal({ mode, doctor, sections, appointments, 
   // useForm manages state, errors, and submit
   const { data, setData, post, put, processing, errors, reset } =
     useForm<DoctorFormData>({
-      section_id:      doctor?.section?.id ?? '',
-      name:            doctor?.name ?? '',
+      id: doctor?.id ?? '',
+      section_id: doctor?.section?.id ?? '',
+      name: doctor?.name ?? '',
       appointment_ids: doctor?.appointments?.map(a => a.id) ?? [],
-      email:           doctor?.email ?? '',
-      password:        '',
-      phone:           doctor?.phone ?? '',
-      price:           String(doctor?.price ?? ''),
-      image:           null,
+      email: doctor?.email ?? '',
+      password: '',
+      phone: doctor?.phone ?? '',
+      price: String(doctor?.price ?? ''),
+      image: null,
     });
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
-    const opts = { onSuccess: () => { reset(); onClose(); } };
+    const opts = {
+      onSuccess: () => { reset(); onClose(); },
+      onError: (errs: any) => { console.error('Add/Edit doctor errors:', errs); },
+      onFinish: () => { console.log('Add/Edit doctor request finished'); },
+      // ensure files are sent as FormData when present
+      forceFormData: true,
+    } as any;
+
+    console.log(isEdit ? 'Submitting edit doctor' : 'Submitting new doctor', data);
+
+    if (!storeUrl) {
+      console.error('DoctorFormModal: storeUrl is undefined — cannot submit.');
+      return;
+    }
 
     // Inertia accepts URL directly — without Ziggy
     if (isEdit) {
-      // PUT — but with file upload we use post + method spoofing
-      post(storeUrl + '?_method=PUT', opts);
+      // Use the provided `put` helper so Inertia sends a proper PUT request
+      // (it will handle FormData when `forceFormData` is true)
+      put(storeUrl, opts);
     } else {
       post(storeUrl, opts);
     }
@@ -130,7 +145,7 @@ export default function DoctorFormModal({ mode, doctor, sections, appointments, 
                 <input type="number" value={data.price}
                   onChange={(e) => setData('price', e.target.value)}
                   className={errors.price ? styles.inputError : styles.input}
-                  min="0" step="50" />
+                />
                 {errors.price && <span className={styles.errorMsg}>{errors.price}</span>}
               </div>
               <div className={styles.formGroup}>

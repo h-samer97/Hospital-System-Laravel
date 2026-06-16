@@ -2,8 +2,8 @@
 
 namespace App\Interfaces;
 
-use App\Http\Requests\dashboard\StoreSectionRequest;
-use App\Http\Requests\dashboard\UpdateSectionRequest;
+use App\Http\Requests\Dashboard\StoreSectionRequest;
+use App\Http\Requests\Dashboard\UpdateSectionRequest;
 use App\Models\Section;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
