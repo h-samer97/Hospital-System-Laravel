@@ -81,6 +81,12 @@ return [
             'level' => env('LOG_LEVEL', 'critical'),
             'replace_placeholders' => true,
         ],
+        # Custem Logging
+        'finance' => [
+        'driver' => 'single',
+        'path' => storage_path('logs/finance.log'),
+        'level' => 'debug',
+        ],
 
         'papertrail' => [
             'driver' => 'monolog',

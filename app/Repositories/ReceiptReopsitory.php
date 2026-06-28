@@ -15,17 +15,19 @@ use Override;
 use Response;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
-class ReceiptReopsitory implements IReceipt {
+class ReceiptReopsitory implements IReceipt
+{
 
 
-  public function __construct(private readonly ReceiptService $receipt_service) {}
+    public function __construct(private readonly ReceiptService $receipt_service) {}
 
-  #[Override]
-  public function index() : InertiaResponse {
-    $receipt = ReceiptAccount::with('patient:id,name')
-    ->select('id', 'date', 'patient_id', 'debit', 'description', 'created_at')
-    ->latest()
-    ->paginate(15) 
+    #[Override]
+    public function index(): InertiaResponse
+    {
+        $receipt = ReceiptAccount::with('patient:id,name')
+            ->select('id', 'date', 'patient_id', 'debit', 'description', 'created_at')
+            ->latest()
+            ->paginate(15)
             ->through(fn(ReceiptAccount $r) => [
                 'id'          => $r->id,
                 'date'        => $r->date->format('Y-m-d'),
@@ -39,39 +41,39 @@ class ReceiptReopsitory implements IReceipt {
                     'destroy' => route('receipt.destroy', $r->id),
                 ],
             ]);
-        return Inertia::render('Receipt/Index', [
-            'url_store' => route('receipt.store'),
-            'receipt' => $receipt,
+        return Inertia::render('Receipts/Index', [
+            'store_url' => route('receipt.store'),
+            'receipts' => $receipt,
             'patients' => Patients::where('is_active', '=', true, true)
-            ->select('id', 'name')
-            ->orderBy('name')
-            ->get(),
+                ->select('id', 'name')
+                ->orderBy('name')
+                ->get(),
         ]);
-  }
+    }
 
-  #[Override]
-  public function store(StoreReceiptRequest $request) : RedirectResponse {
+    #[Override]
+    public function store(StoreReceiptRequest $request): RedirectResponse
+    {
 
-    $this->receipt_service->store($request->validated());
-    return redirect()->route('receipt.index')->with('flash', [
+        $this->receipt_service->store($request->validated());
+        return redirect()->route('receipt.index')->with('flash', [
             'type'    => 'success',
             'message' => 'Receipt created successfully',
         ]);
+    }
 
-  }
-
-  #[Override]
-  public function update(StoreReceiptRequest $request, ReceiptAccount $receipt): RedirectResponse
-  {
-     $this->receipt_service->update($receipt, $request->validated());
+    #[Override]
+    public function update(StoreReceiptRequest $request, ReceiptAccount $receipt): RedirectResponse
+    {
+        $this->receipt_service->update($receipt, $request->validated());
 
         return redirect()->route('receipt.index')->with('flash', [
             'type'    => 'success',
             'message' => 'Receipt updated successfully',
         ]);
-  }
+    }
 
-  public function destroy(ReceiptAccount $receipt): RedirectResponse
+    public function destroy(ReceiptAccount $receipt): RedirectResponse
     {
         try {
             $this->receipt_service->destroy($receipt);
@@ -87,5 +89,4 @@ class ReceiptReopsitory implements IReceipt {
             ]);
         }
     }
-
 }

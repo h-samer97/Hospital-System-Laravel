@@ -16,7 +16,7 @@ class ReceiptAccountRepository implements IReceiptAccount
   {
     $receipts = ReceiptAccount::with('patient')->latest()->get();
 
-    return inertia('ReceiptAccounts/Index', [
+    return inertia('Receipts/Index', [
       'receipts' => $receipts,
     ]);
   }

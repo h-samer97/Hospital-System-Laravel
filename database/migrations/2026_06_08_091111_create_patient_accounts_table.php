@@ -16,9 +16,9 @@ return new class extends Migration
             $table->date('date');
             $table->foreignId('single_invoice_id')
                 ->constrained('single_invoices')->cascadeOnDelete();
-            // `receipts` table may be created after this migration; avoid adding
-            // the foreign key constraint here. Use nullable unsignedBigInteger
-            // and add the FK in a dedicated migration if needed.
+
+            $table->unsignedBigInteger('payment_id')->nullable();
+
             $table->unsignedBigInteger('receipt_id')->nullable();
             $table->foreignId('patient_id')
                 ->constrained('patients')->cascadeOnDelete();

@@ -39,4 +39,8 @@ class PatientAccounts extends Model
     public function receipt() : BelongsTo {
         return $this->belongsTo(ReceiptAccount::class, 'receipt_id');
     }
+    public function payment(): BelongsTo
+    {
+        return $this->belongsTo(PaymentAccount::class, 'payment_id');
+    }
 }

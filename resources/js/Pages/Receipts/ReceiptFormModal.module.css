@@ -1,0 +1,252 @@
+/* Styles for Receipt form modal (copied from ReceiptFormData.module.css) */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 14px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  animation: slideUp 0.25s ease;
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.header h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  margin: 0.2rem 0 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: #94a3b8;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  color: #374151;
+}
+
+.body {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+}
+
+.formGroup label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.searchInput {
+  padding: 0.5rem 0.85rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  margin-bottom: 0.35rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.input,
+.inputError {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  box-sizing: border-box;
+  font-family: inherit;
+}
+
+.input {
+  border: 1.5px solid #d1d5db;
+  background: #fff;
+}
+
+.inputError {
+  border: 1.5px solid #ef4444;
+  background: #fff5f5;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #6366f1;
+}
+
+.errorMsg {
+  font-size: 0.8rem;
+  color: #ef4444;
+}
+
+/* Patient badges */
+.selectedBadge {
+  font-size: 0.8rem;
+  color: #059669;
+  background: #d1fae5;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  align-self: flex-start;
+}
+
+.searchCount {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* Amount preview */
+.amountPreview {
+  font-size: 0.875rem;
+  color: #059669;
+  font-weight: 600;
+}
+
+/* Char count */
+.charCount {
+  font-size: 0.78rem;
+  color: #94a3b8;
+  text-align: right;
+}
+
+.charCountWarn {
+  color: #f59e0b;
+}
+
+/* Accounting Summary */
+.accountingSummary {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 1rem;
+  margin-top: 0.5rem;
+  border: 1px solid #e2e8f0;
+}
+
+.summaryTitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0 0 0.75rem;
+}
+
+.summaryRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.875rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.summaryRow:last-child {
+  border-bottom: none;
+}
+
+.debitColor {
+  color: #059669;
+}
+
+.creditColor {
+  color: #e11d48;
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid #f1f5f9;
+}
+
+.cancelBtn {
+  padding: 0.6rem 1.25rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background: #f8fafc;
+}
+
+.submitBtn {
+  padding: 0.6rem 1.25rem;
+  border: none;
+  border-radius: 8px;
+  background: #6366f1;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.submitBtn:hover {
+  background: #4f46e5;
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

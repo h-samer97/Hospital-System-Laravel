@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             GroupsTableSeeder::class,
             InsurancesTableSeeder::class,
             PatientsTableSeeder::class,
+            ReceiptSeeder::class,
             \Database\Seeders\SingleInvoicesTableSeeder::class,
             AmbulancesTableSeeder::class,
         ]);
