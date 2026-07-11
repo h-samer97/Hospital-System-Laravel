@@ -29,7 +29,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.4'
           extensions: mbstring, pdo, pdo_mysql
           coverage: none
 
@@ -59,7 +59,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.2', '8.3']
+        php: ['8.4'] # تحديث المصفوفة لتشمل الإصدار المتوافق 8.4 فقط حالياً
       fail-fast: false
 
     steps:
@@ -115,7 +115,7 @@ jobs:
           QUEUE_CONNECTION: sync
 
       - name: Upload Coverage Report
-        if: matrix.php == '8.3'
+        if: matrix.php == '8.4' # التحديث ليتوافق مع الإصدار الجديد
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -158,15 +158,6 @@ jobs:
 
   # ============================================================
   # Job 4: Deploy (Production)
-  #
-  # ملاحظة: لا يوجد سيرفر إنتاج فعلي حاليًا (PROD_HOST/PROD_USER/
-  # PROD_SSH_KEY غير مُعرّفة بعد بسبب قيود الدفع الدولية).
-  # هذا الـ job مكتوب بالكامل وجاهز، لكنه يتحقق أولاً من وجود
-  # الأسرار، وإن لم تكن موجودة يطبع رسالة توضيحية ويتخطى الخطوة
-  # الفعلية بدلاً من الفشل أو التعليق بانتظار موافقة بيئة غير معدّة.
-  #
-  # عند توفر VPS لاحقًا: أضف الـ 3 secrets فقط في GitHub،
-  # بدون أي تعديل على هذا الملف.
   # ============================================================
   deploy:
     name: 🚀 Deploy to Production
