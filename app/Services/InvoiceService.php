@@ -8,17 +8,16 @@ use App\Models\SingleInvoices;
 
 class InvoiceService
 {
-    public function calculate(float $total, float $tax, float $discount): array
+    public function calculate(float $price, float $taxRate, float $discount): array
     {
+        $subTotal = $discount > 0 ? \max(0, $price - $discount) : $price;
 
-        $subTotal = $discount > 0 ? \max(0, $total - $discount) : $total;
-
-        $tax_value = $subTotal * ($tax / 100);
+        $tax_value = $subTotal * ($taxRate / 100);
 
         $total_with_tax = $subTotal + $tax_value;
 
         return [
-            'sub_total' => \round($subTotal, 2),
+            'subtotal' => \round($subTotal, 2),
             'tax_value' => \round($tax_value, 2),
             'total' => \round($total_with_tax, 2),
         ];

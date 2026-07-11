@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\IReceiptAccount;
 use App\Models\ReceiptAccount;
-use App\Models\Patient;
+use App\Models\Patients as Patient;
 use App\Models\Patients;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;

@@ -19,12 +19,14 @@ class DoctorFactory extends Factory
     public function definition(): array
     {
         // $daysAR = ['السبت','الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+        $faker = \Faker\Factory::create();
+
         return [
-            'name' => $this->faker->name(),
-            'email' => $this->faker->unique()->safeEmail(),
+            'name' => $faker->name(),
+            'email' => $faker->unique()->safeEmail(),
             'password' => bcrypt('password'),
-            'phone' => $this->faker->phoneNumber(),
-            'price' => $this->faker->randomFloat(2, 50, 500),
+            'phone' => $faker->phoneNumber(),
+            'price' => $faker->randomFloat(2, 50, 500),
             'is_active' => true,
             'section_id' => Section::factory(),
             'email_verified_at' => now(),

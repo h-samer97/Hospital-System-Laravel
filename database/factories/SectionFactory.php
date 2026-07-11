@@ -11,9 +11,13 @@ use Illuminate\Support\Str;
  */
 class SectionFactory extends Factory
 {
+    /**
+     * The name of the factory's corresponding model.
+     */
+    protected $model = Section::class;
     public function definition(): array
     {
-         $sections = [
+        $sections = [
             'طوارئ',
             'باطنة',
             'جراحة',
@@ -25,7 +29,7 @@ class SectionFactory extends Factory
         ];
 
         return [
-            'name' => $this->faker->randomElement($sections),
+            'name' => $sections[array_rand($sections)],
             'is_active' => true,
         ];
     }

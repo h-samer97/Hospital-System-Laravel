@@ -20,7 +20,7 @@ class PaymentService
 
 
       # Step 1 => Generate a bond
-      $payment = PaymentAccount::create([
+      $payment = app(PaymentAccount::class)->create([
 
         'date' => now()->toDateString(),
         'patient_id' => $data['patient_id'],
@@ -30,7 +30,7 @@ class PaymentService
       ]);
 
       # Step 2 => The Money Out!
-      FundAccounts::create([
+      app(FundAccounts::class)->create([
         'date' => now()->toDateString(),
         'payment_id' => $payment->id,
         'debit' => 0.00,
@@ -38,7 +38,7 @@ class PaymentService
       ]);
 
       # Step 3 => the patient account is increment  
-      PatientAccount::create([
+      app(PatientAccount::class)->create([
         'date'       => now()->toDateString(),
         'patient_id' => $payment->patient_id,
         'payment_id' => $payment->id,
@@ -47,7 +47,6 @@ class PaymentService
       ]);
 
       GeneratePaymentReceiptJob::dispatch($payment->id)->afterCommit();
-
       Log::channel('finance')->info('Payment Created', [
         'payment_id' => $payment->id,
         'admin_id' => $adminId,
@@ -94,6 +93,8 @@ class PaymentService
         'payment_id' => $payment->id,
         'admin_id'   => $adminId,
       ]);
+
+      return $payment;
     });
 
     return $payment->fresh();

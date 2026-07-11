@@ -1,0 +1,39 @@
+# يُستخدم فوق docker-compose.yml الأساسي:
+# docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+
+services:
+
+  php:
+    build:
+      target: final     # الـ stage النظيف بدون dev tools
+    environment:
+      APP_ENV:   production
+      APP_DEBUG: "false"
+    # لا volumes للكود في Production — الكود داخل الصورة
+    volumes:
+      - ./docker/php/php.ini:/usr/local/etc/php/conf.d/valex.ini:ro
+      - storage_data:/var/www/html/storage  # storage مشترك مع Nginx
+    deploy:
+      resources:
+        limits:
+          cpus:   '1.0'
+          memory: 512M
+
+  nginx:
+    volumes:
+      - storage_data:/var/www/html/storage:ro  # لعرض الصور المرفوعة
+
+  queue:
+    build:
+      target: final
+    deploy:
+      replicas: 2    # worker متعدد في Production
+
+  mysql:
+    ports: []        # لا نُظهر Port في Production — داخلي فقط
+
+  redis:
+    ports: []
+
+volumes:
+  storage_data:

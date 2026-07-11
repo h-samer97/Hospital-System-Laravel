@@ -1,0 +1,31 @@
+name: Coverage Comment
+
+on:
+  workflow_run:
+    workflows: ["Valex CI/CD Pipeline"]
+    types: [completed]
+
+jobs:
+  comment:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Coverage
+        uses: actions/download-artifact@v4
+        with:
+          name: coverage-report
+
+      - name: Comment Coverage on PR
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          message: |
+            ## 📊 Test Coverage Report
+
+            | Suite   | Coverage |
+            |---------|----------|
+            | Unit    | ${{ env.UNIT_COVERAGE }}%  |
+            | Feature | ${{ env.FEAT_COVERAGE }}%  |
+            | **Total**   | **${{ env.TOTAL_COVERAGE }}%** |
+
+            ✅ All tests passed on PHP 8.2 + 8.3

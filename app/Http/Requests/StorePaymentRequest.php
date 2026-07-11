@@ -12,18 +12,27 @@ class StorePaymentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        // Allow if the currently authenticated user (default guard) has the permission,
+        // or fall back to the 'admin' guard if used elsewhere in the app.
+        $user = $this->user() ?? $this->user('admins');
+        return $user ? $user->can('payment.manage') : false;
     }
 
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
-            //
+            'patient_id' => ['required', 'exists:patients,id,is_active,1'],
+            'amount'    => ['required', 'numeric', 'min:0.01', 'max:999999.99'],
+            'description' => ['nullable', 'string', 'max:255']
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        if ($this->has('description')) {
+            $this->merge([
+                'description' => is_string($this->input('description')) ? trim($this->input('description')) : $this->input('description'),
+            ]);
+        }
     }
 }

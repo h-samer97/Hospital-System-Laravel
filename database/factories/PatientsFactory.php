@@ -20,9 +20,17 @@ class PatientsFactory extends Factory
       'password' => bcrypt('password'),
       'birth_date' => $this->faker->date('Y-m-d'),
       'phone' => $this->faker->phoneNumber(),
-      'gender' => $this->faker->randomElement([1, 2]),
+      'gender' => $this->faker->randomElement(['male', 'female']),
       'blood_group' => $this->faker->randomElement(['O-', 'O+', 'A-', 'A+', 'B-', 'B+', 'AB-', 'AB+']),
       'address' => $this->faker->address(),
+      'is_active' => true,
     ];
+  }
+
+  public function inactive(): self
+  {
+    return $this->state(fn() => [
+      'is_active' => false,
+    ]);
   }
 }

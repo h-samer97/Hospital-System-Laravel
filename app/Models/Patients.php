@@ -17,7 +17,8 @@ class Patients extends Model
         'phone',
         'gender',
         'blood_group',
-        'address'
+        'address',
+        'is_active',
     ];
 
     public function casts(): array

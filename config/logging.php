@@ -83,10 +83,11 @@ return [
         ],
         # Custem Logging
         'finance' => [
-        'driver' => 'single',
-        'path' => storage_path('logs/finance.log'),
-        'level' => 'debug',
-        ],
+        'driver' => 'daily',
+        'path'   => storage_path('logs/finance.log'),
+        'level'  => 'debug',
+        'days'   => 90, // الاحتفاظ بسجلات مالية 90 يوماً
+    ],
 
         'papertrail' => [
             'driver' => 'monolog',

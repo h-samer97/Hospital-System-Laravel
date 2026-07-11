@@ -7,6 +7,7 @@ use App\Interfaces\IDoctor;
 use App\Interfaces\IGroups;
 use App\Interfaces\IInsurance;
 use App\Interfaces\IPatients;
+use App\Interfaces\IPayment;
 use App\Interfaces\IService;
 use App\Interfaces\ISections;
 use App\Interfaces\ISingleInvoice;
@@ -16,11 +17,13 @@ use App\Repositories\DoctorRepository;
 use App\Repositories\GroupsRepository;
 use App\Repositories\InsuranceRepository;
 use App\Repositories\PatientsRepository;
+use App\Repositories\PaymentAccountRepository;
 use App\Repositories\SectionsRepositories;
 use App\Repositories\ServiceRepository;
 use App\Repositories\SingleInvoiceRepository;
 use App\Repositories\ReceiptAccountRepository;
 use App\Services\InvoiceService;
+use App\Services\PaymentService;
 use App\Services\ReceiptService;
 use Illuminate\Support\ServiceProvider;
 
@@ -41,6 +44,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->bind(IReceiptAccount::class, ReceiptAccountRepository::class);
         $this->app->singleton(InvoiceService::class);
         $this->app->singleton(ReceiptService::class);
+        $this->app->singleton(PaymentService::class);
+        $this->app->bind(IPayment::class, PaymentAccountRepository::class);
+
         $this->app->bind(ISingleInvoice::class, SingleInvoiceRepository::class);
     }
 

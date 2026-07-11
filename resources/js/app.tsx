@@ -10,11 +10,14 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
-    resolve: (name) =>
-        resolvePageComponent(
-            `./Pages/${name}.tsx`,
+    resolve: (name) => {
+        const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+        const path = name.split('.').map(capitalize).join('/');
+        return resolvePageComponent(
+            `./Pages/${path}.tsx`,
             import.meta.glob('./Pages/**/*.tsx'),
-        ),
+        );
+    },
     setup({ el, App, props }) {
         if (import.meta.env.SSR) {
             hydrateRoot(el, <App {...props} />);

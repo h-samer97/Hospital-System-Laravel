@@ -12,6 +12,7 @@ use App\Http\Controllers\GroupController;
 use App\Http\Controllers\PatientsController;
 use App\Http\Controllers\InsurancesController;
 use App\Http\Controllers\AmbulancesController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ReceiptAccountController;
 use App\Http\Controllers\SingleInvoicesController;
 use Illuminate\Http\Request;
@@ -49,6 +50,7 @@ Route::middleware('guest')->group(function () {
 
 // Routes للمستخدمين العاديين
 Route::middleware("auth:web")->group(function () {
+    Route::get("dashboard", [DashboardController::class, "index"])->name("dashboard");
     Route::get("dashboard/user", [DashboardController::class, "index"])->name("dashboard.user");
 });
 
@@ -86,14 +88,15 @@ Route::middleware("auth:admins")->group(function () {
     Route::resource('ambulances', AmbulancesController::class)
         ->only(['index', 'create', 'store', 'edit', 'update', 'destroy']);
 
-   
-    
+
+
     Route::middleware(['auth:admins', 'throttle:financial'])
-    ->group(function () {
-        Route::resource('receipt', ReceiptAccountController::class)
-            ->only(['index', 'store', 'update', 'destroy']);
-    });
-     Route::resource('single_invoices', SingleInvoicesController::class)
+        ->group(function () {
+            Route::resource('receipt', ReceiptAccountController::class)
+                ->only(['index', 'store', 'update', 'destroy']);
+            Route::resource('payments', PaymentController::class)
+                ->only(['index', 'store', 'update', 'destroy']);
+        });
+    Route::resource('single_invoices', SingleInvoicesController::class)
         ->only(['index', 'store', 'update', 'destroy']);
 });
-
