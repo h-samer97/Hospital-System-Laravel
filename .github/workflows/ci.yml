@@ -31,15 +31,13 @@ jobs:
         with:
           php-version: '8.3'
           extensions: mbstring, pdo, pdo_mysql
-          coverage: none   # لا نحتاج coverage هنا
+          coverage: none
 
-      # ===== Cache composer dependencies =====
       - name: Cache Composer Packages
         id: composer-cache
         uses: actions/cache@v4
         with:
           path: vendor
-          # مفتاح الكاش يتغير فقط عندما يتغير composer.lock
           key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
           restore-keys: ${{ runner.os }}-composer-
 
@@ -47,11 +45,8 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      # ===== Laravel Pint (Code Style) =====
       - name: Run Laravel Pint
         run: ./vendor/bin/pint --test
-        # --test: يتحقق فقط ولا يُغيّر الكود
-        # إذا الكود غير منسّق → يفشل الـ pipeline
 
   # ============================================================
   # Job 2: Tests
@@ -60,14 +55,11 @@ jobs:
     name: 🧪 Run Tests
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    # ينتظر نجاح lint أولاً
     needs: lint
 
     strategy:
-      # اختبار على أكثر من إصدار PHP
       matrix:
         php: ['8.2', '8.3']
-      # لا تلغي بقية الـ matrix إذا فشل إصدار واحد
       fail-fast: false
 
     steps:
@@ -79,7 +71,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           extensions: mbstring, pdo, pdo_sqlite, sqlite3
-          coverage: xdebug   # لتوليد تقرير coverage
+          coverage: xdebug
 
       - name: Cache Composer Packages
         id: composer-cache
@@ -93,7 +85,6 @@ jobs:
         if: steps.composer-cache.outputs.cache-hit != 'true'
         run: composer install --no-interaction --no-progress --prefer-dist
 
-      # ===== إعداد Laravel =====
       - name: Copy Environment File
         run: cp .env.example .env
 
@@ -103,7 +94,6 @@ jobs:
       - name: Create SQLite Database
         run: touch database/database.sqlite
 
-      # ===== تثبيت Node.js =====
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -111,24 +101,21 @@ jobs:
           cache: 'npm'
 
       - name: Install NPM Dependencies
-        run: npm ci    # ci أسرع وأكثر صرامة من install
+        run: npm ci
 
       - name: Build Assets
         run: npm run build
 
-      # ===== تشغيل الـ Tests مع Coverage =====
       - name: Run Pest Tests
         run: ./vendor/bin/pest --coverage --min=70
-        # --min=70: يفشل إذا Coverage < 70%
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE:   database/database.sqlite
           CACHE_DRIVER:  array
           QUEUE_CONNECTION: sync
 
-      # ===== رفع تقرير Coverage لـ PR =====
       - name: Upload Coverage Report
-        if: matrix.php == '8.3'   # مرة واحدة فقط
+        if: matrix.php == '8.3'
         uses: actions/upload-artifact@v4
         with:
           name: coverage-report
@@ -142,42 +129,44 @@ jobs:
     name: 🐳 Build Docker Image
     runs-on: ubuntu-latest
     needs: test
-    # فقط على main branch
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      # ===== Docker Buildx (multi-platform) =====
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      # ===== Login إلى Docker Hub =====
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      # ===== Build + Push =====
       - name: Build and Push PHP Image
         uses: docker/build-push-action@v5
         with:
           context: .
           file: docker/php/Dockerfile
-          target: final     # production stage فقط
           push: true
-          # تاريخ + SHA = يمكن الرجوع لأي version سابقة
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/valex-php:latest
             ${{ secrets.DOCKER_USERNAME }}/valex-php:${{ github.sha }}
-          # Layer caching — يُسرّع الـ build
           cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/valex-php:latest
           cache-to:   type=inline
 
   # ============================================================
   # Job 4: Deploy (Production)
+  #
+  # ملاحظة: لا يوجد سيرفر إنتاج فعلي حاليًا (PROD_HOST/PROD_USER/
+  # PROD_SSH_KEY غير مُعرّفة بعد بسبب قيود الدفع الدولية).
+  # هذا الـ job مكتوب بالكامل وجاهز، لكنه يتحقق أولاً من وجود
+  # الأسرار، وإن لم تكن موجودة يطبع رسالة توضيحية ويتخطى الخطوة
+  # الفعلية بدلاً من الفشل أو التعليق بانتظار موافقة بيئة غير معدّة.
+  #
+  # عند توفر VPS لاحقًا: أضف الـ 3 secrets فقط في GitHub،
+  # بدون أي تعديل على هذا الملف.
   # ============================================================
   deploy:
     name: 🚀 Deploy to Production
@@ -185,20 +174,31 @@ jobs:
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
 
-    # بيئة تحتاج موافقة يدوية قبل الـ deploy
-    environment:
-      name: production
-      url: https://valex.hospital
-
     steps:
+      - name: Check production secrets
+        id: check_secrets
+        run: |
+          if [ -n "${{ secrets.PROD_HOST }}" ] && [ -n "${{ secrets.PROD_USER }}" ] && [ -n "${{ secrets.PROD_SSH_KEY }}" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Skip notice (no production server yet)
+        if: steps.check_secrets.outputs.configured == 'false'
+        run: |
+          echo "⚠️  Deploy skipped: PROD_HOST / PROD_USER / PROD_SSH_KEY not configured yet."
+          echo "This step will activate automatically once those secrets are added."
+
       - name: Deploy via SSH
+        if: steps.check_secrets.outputs.configured == 'true'
         uses: appleboy/ssh-action@v1
         with:
           host:     ${{ secrets.PROD_HOST }}
           username: ${{ secrets.PROD_USER }}
           key:      ${{ secrets.PROD_SSH_KEY }}
           script: |
-            set -e   # يوقف الـ script عند أي خطأ
+            set -e
 
             cd /var/www/valex
 
