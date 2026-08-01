@@ -17,7 +17,7 @@ jobs:
           name: coverage-report
 
       - name: Comment Coverage on PR
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: marocchino/sticky-pull-request-comment@v3
         with:
           message: |
             ## 📊 Test Coverage Report
