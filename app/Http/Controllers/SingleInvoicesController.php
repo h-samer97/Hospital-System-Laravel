@@ -7,6 +7,7 @@ use App\Interfaces\ISingleInvoice;
 use App\Http\Requests\StoreSingleInvoiceRequest;
 use App\Http\Requests\UpdateSingleInvoiceRequest;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response as HttpResponse;
 use Inertia\Response;
 
 class SingleInvoicesController extends Controller
@@ -33,8 +34,17 @@ class SingleInvoicesController extends Controller
         return $this->singleInvoiceRepo->destroy($invoice);
     }
 
+    public function show(SingleInvoices $invoice): Response
+    {
+        return $this->singleInvoiceRepo->show($invoice);
+    }
+
+    public function download(SingleInvoices $invoice): Response
+    {
+        return $this->singleInvoiceRepo->download($invoice);
+    }
+
     // keep other methods as no-op to satisfy resource controller
     public function create() {}
-    public function show(SingleInvoices $invoice) {}
     public function edit(SingleInvoices $invoice) {}
 }

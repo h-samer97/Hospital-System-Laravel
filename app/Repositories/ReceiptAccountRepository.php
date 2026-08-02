@@ -6,17 +6,44 @@ use App\Interfaces\IReceiptAccount;
 use App\Models\ReceiptAccount;
 use App\Models\Patients as Patient;
 use App\Models\Patients;
+use App\Services\PrintService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Response as FacadesResponse;
+use Inertia\Inertia;
 use Inertia\Response;
+use Response as GlobalResponse;
 
 class ReceiptAccountRepository implements IReceiptAccount
 {
+
+  public function __construct(
+    private readonly PrintService $print
+  ) {}
+
   public function index(): Response
   {
-    $receipts = ReceiptAccount::with('patient')->latest()->get();
+    $receipts = ReceiptAccount::with('patient:id,name')
+      ->select('id', 'date', 'patient_id', 'debit', 'description', 'created_at')
+      ->latest()
+      ->paginate(15)
+      ->through(fn(ReceiptAccount $receipt) => [
+        'id' => $receipt->id,
+        'date' => $receipt->date->format('Y-m-d'),
+        'patient' => $receipt->patient?->name,
+        'patient_id' => $receipt->patient_id,
+        'debit' => $receipt->debit,
+        'description' => $receipt->description,
+        'created_at' => $receipt->created_at,
+        'urls' => [
+          'update' => route('receipt.update', $receipt->id),
+          'destroy' => route('receipt.destroy', $receipt->id),
+          'print' => $this->print->generateSigneURL($receipt, 'Receipt.show'),
+          'download' => $this->print->generateSigneURL($receipt, 'Receipt.download'),
+        ]
+      ]);
 
-    return inertia('Receipts/Index', [
+    return Inertia::render('Receipts/Index', [
       'receipts' => $receipts,
     ]);
   }
@@ -25,7 +52,7 @@ class ReceiptAccountRepository implements IReceiptAccount
   {
     $patients = Patients::select('id', 'name')->get();
 
-    return inertia('ReceiptAccounts/Create', [
+    return Inertia::render('ReceiptAccounts/Create', [
       'patients' => $patients,
     ]);
   }
@@ -41,7 +68,7 @@ class ReceiptAccountRepository implements IReceiptAccount
 
     ReceiptAccount::create($data);
 
-    return redirect()->route('receipt_accounts.index')->with('success', 'Receipt created');
+    return redirect()->route('receipt.index')->with('success', 'Receipt created');
   }
 
   public function edit(int $id): Response
@@ -49,7 +76,7 @@ class ReceiptAccountRepository implements IReceiptAccount
     $receipt = ReceiptAccount::with('patient')->findOrFail($id);
     $patients = Patients::select('id', 'name')->get();
 
-    return inertia('ReceiptAccounts/Edit', [
+    return Inertia::render('ReceiptAccounts/Edit', [
       'receipt' => $receipt,
       'patients' => $patients,
     ]);
@@ -68,7 +95,7 @@ class ReceiptAccountRepository implements IReceiptAccount
 
     $receipt->update($data);
 
-    return redirect()->route('receipt_accounts.index')->with('success', 'Receipt updated');
+    return redirect()->route('receipt.index')->with('success', 'Receipt updated');
   }
 
   public function destroy(int $id): RedirectResponse
@@ -77,5 +104,47 @@ class ReceiptAccountRepository implements IReceiptAccount
     $receipt->delete();
 
     return redirect()->back()->with('success', 'Receipt deleted');
+  }
+
+  public function show(ReceiptAccount $receipt): Response
+  {
+
+    $receipt->load('patient:id,name,phone,address');
+
+    $this->print->logPrint($receipt, request(), 'view');
+
+    return Inertia::render('Dashboard/Finance/Receipts/Print', [
+      'receipt' => [
+        'id' => $receipt->id,
+        'date' => $receipt->date->format('Y-m-d'),
+        'patient' => $receipt->patient?->name,
+        'phone' => $receipt->patient?->phone,
+        'address' => $receipt->patient?->address,
+        'debit' => $receipt->debit,
+        'description' => $receipt->description,
+        'created_at' => $receipt->created_at->format('Y-m-d H:i'),
+      ],
+      'print_count' => $receipt->printLogs()->count()
+    ]);
+  }
+
+  public function download(ReceiptAccount $receipt): Response
+  {
+    $receipt->load('patient:id,name,phone,address');
+    $this->print->logPrint($receipt, \request(), 'download');
+
+    return Inertia::render('Dashboard/Finance/Receipts/Print', [
+      'receipt' => [
+        'id' => $receipt->id,
+        'date' => $receipt->date->format('Y-m-d'),
+        'patient' => $receipt->patient?->name,
+        'phone' => $receipt->patient?->phone,
+        'address' => $receipt->patient?->address,
+        'debit' => $receipt->debit,
+        'description' => $receipt->description,
+        'created_at' => $receipt->created_at->format('Y-m-d H:i'),
+      ],
+      'print_count' => $receipt->printLogs()->count()
+    ]);
   }
 }

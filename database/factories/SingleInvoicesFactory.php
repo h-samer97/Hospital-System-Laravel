@@ -43,4 +43,14 @@ class SingleInvoicesFactory extends Factory
       'type'           => $this->faker->randomElement(['cash', 'deferred']),
     ];
   }
+
+    public function cash(): static
+    {
+        return $this->state(['type' => 'cash']);
+    }
+
+    public function deferred(): static
+    {
+        return $this->state(['type' => 'deferred']);
+    }
 }

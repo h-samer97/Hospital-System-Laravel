@@ -1,0 +1,35 @@
+/* نفس Print.module.css للـ Payment مع تغيير اللون فقط */
+.section { margin-bottom: 1.75rem; }
+.sectionTitle {
+  font-size: 0.8rem; font-weight: 700;
+  color: #94a3b8; text-transform: uppercase;
+  letter-spacing: 0.08em; margin: 0 0 0.75rem;
+  padding-bottom: 0.4rem; border-bottom: 2px solid #f1f5f9;
+}
+.infoGrid {
+  background: #f8fafc; border-radius: 8px; padding: 0.5rem 1rem;
+}
+.description {
+  background: #f8fafc; border-radius: 8px; padding: 1rem;
+  font-size: 0.9rem; color: #374151; line-height: 1.6; margin: 0;
+  border-right: 3px solid #059669;  /* ← أخضر للقبض */
+}
+.amountSection { margin-top: 2rem; }
+.amountBox {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #064e3b;              /* ← أخضر داكن للقبض */
+  color: #fff; padding: 1.25rem 1.5rem; border-radius: 10px; margin-bottom: 0.75rem;
+}
+.amountLabel { font-size: 0.9rem; color: #a7f3d0; }
+.amountValue { font-size: 1.5rem; font-weight: 800; font-family: 'Courier New', monospace; }
+
+.voucherType { margin-top: 1.5rem; text-align: center; }
+.voucherTypeBadge {
+  display: inline-block; background: #ecfdf5; color: #059669;
+  padding: 0.4rem 1.25rem; border-radius: 99px;
+  font-size: 0.85rem; font-weight: 600; border: 1px solid #a7f3d0;
+}
+
+@media print {
+  .amountBox { background: #064e3b !important; -webkit-print-color-adjust: exact; }
+}

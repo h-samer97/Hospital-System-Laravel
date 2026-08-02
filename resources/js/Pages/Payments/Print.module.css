@@ -1,0 +1,72 @@
+.section {
+  margin-bottom: 1.75rem;
+}
+.sectionTitle {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin: 0 0 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+.infoGrid {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+}
+.description {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.6;
+  margin: 0;
+  border-right: 3px solid #6366f1;
+}
+
+/* Amount */
+.amountSection { margin-top: 2rem; }
+.amountBox {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e293b;
+  color: #fff;
+  padding: 1.25rem 1.5rem;
+  border-radius: 10px;
+  margin-bottom: 0.75rem;
+}
+.amountLabel { font-size: 0.9rem; color: #94a3b8; }
+.amountValue {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'Courier New', monospace;
+}
+.amountWords {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin: 0;
+  font-style: italic;
+}
+
+/* Voucher Type Badge */
+.voucherType { margin-top: 1.5rem; text-align: center; }
+.voucherTypeBadge {
+  display: inline-block;
+  background: #eff6ff;
+  color: #3b82f6;
+  padding: 0.4rem 1.25rem;
+  border-radius: 99px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  border: 1px solid #bfdbfe;
+}
+
+/* Print overrides */
+@media print {
+  .amountBox { background: #1e293b !important; -webkit-print-color-adjust: exact; }
+}

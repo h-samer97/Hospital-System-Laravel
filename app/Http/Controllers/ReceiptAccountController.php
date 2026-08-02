@@ -2,8 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Interfaces\IReceiptAccount;
+use App\Models\ReceiptAccount;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response as HttpResponse;
+use Inertia\Response;
 
 class ReceiptAccountController extends Controller
 {
@@ -24,9 +28,9 @@ class ReceiptAccountController extends Controller
         return $this->repo->store($request);
     }
 
-    public function show($id)
+    public function show(ReceiptAccount $receipt): Response
     {
-        // optional: could be implemented in the repo
+        return $this->repo->show($receipt);
     }
 
     public function edit($id)
@@ -39,8 +43,13 @@ class ReceiptAccountController extends Controller
         return $this->repo->update($request, (int) $id);
     }
 
-    public function destroy($id)
+    public function destroy($id): RedirectResponse
     {
         return $this->repo->destroy((int) $id);
+    }
+
+    public function download(ReceiptAccount $receipt): Response
+    {
+        return $this->repo->download($receipt);
     }
 }

@@ -7,6 +7,8 @@ export interface Payment {
   description: string;
   created_at:  string;
   urls: {
+    print?:    string;
+    download?: string;
     update:  string;
     destroy: string;
   };

@@ -39,3 +39,20 @@
 .submitBtn { padding: 0.6rem 1.25rem; border: none; border-radius: 8px; background: #6366f1; color: #fff; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
 .submitBtn:hover { background: #4f46e5; }
 .submitBtn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* أزرار Print/Download */
+.printBtn,
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background 0.15s;
+  cursor: pointer;
+}
+.printBtn:hover    { background: #f0fdf4; }
+.downloadBtn:hover { background: #eff6ff; }

@@ -12,6 +12,7 @@ use App\Services\InvoiceService;
 use App\Models\Service;
 use App\Http\Requests\StoreSingleInvoiceRequest;
 use App\Http\Requests\UpdateSingleInvoiceRequest;
+use App\Services\PrintService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -19,7 +20,10 @@ use Inertia\Response;
 class SingleInvoiceRepository implements ISingleInvoice
 {
 
-  public function __construct(private readonly InvoiceService $invoiceService) {}
+  public function __construct(
+    private readonly InvoiceService $invoiceService,
+    private readonly PrintService $print
+  ) {}
 
   public function index(): Response
   {
@@ -63,6 +67,8 @@ class SingleInvoiceRepository implements ISingleInvoice
         'urls' => [
           'update'  => route('single_invoices.update',  $inv->id),
           'destroy' => route('single_invoices.destroy', $inv->id),
+          'print'    => $this->print->generateSigneURL($inv, 'single_invoices.show'),
+          'download' => $this->print->generateSigneURL($inv, 'single_invoices.download'),
         ],
       ]);
 
@@ -114,6 +120,69 @@ class SingleInvoiceRepository implements ISingleInvoice
     return redirect()->route('single_invoices.index')->with('flash', [
       'type'    => 'success',
       'message' => 'Invoice deleted successfully',
+    ]);
+  }
+
+  public function show(SingleInvoices $invoice): Response
+  {
+
+    $invoice->load(
+      [
+        'patient:name,id,phone,address',
+        'doctor:id,name,section_id',
+        'doctor.section:name,id',
+        'service:name,id'
+      ]
+    );
+
+    $this->print->logPrint($invoice, \request(), 'view');
+
+    return Inertia::render('Dashboard/Invoices/SingleInvoices/Print', [
+      'invoice' => [
+        'id'             => $invoice->id,
+        'invoice_date'   => $invoice->invoice_date->format('Y-m-d'),
+        'patient'        => $invoice->patient?->name,
+        'phone'          => $invoice->patient?->phone,
+        'doctor'         => $invoice->doctor?->name,
+        'section'        => $invoice->doctor?->section?->name,
+        'service'        => $invoice->service?->name,
+        'price'          => $invoice->price,
+        'discount_value' => $invoice->discount_value,
+        'tax_rate'       => $invoice->tax_rate,
+        'tax_value'      => $invoice->tax_value,
+        'total_with_tax' => $invoice->total_with_tax,
+        'type'           => $invoice->type,
+        'type_label'     => $invoice->type_label,
+        'created_at'     => $invoice->created_at->format('Y-m-d H:i'),
+      ],
+      'print_count' => $invoice->printLogs()->count(),
+    ]);
+  }
+
+  public function download(SingleInvoices $invoice): Response
+  {
+    $invoice->load(['patient', 'doctor.section', 'service']);
+    $this->print->logPrint($invoice, request(), 'download');
+    
+    return Inertia::render('Dashboard/Invoices/SingleInvoices/Print', [
+      'invoice' => [
+        'id'             => $invoice->id,
+        'invoice_date'   => $invoice->invoice_date->format('Y-m-d'),
+        'patient'        => $invoice->patient?->name,
+        'phone'          => $invoice->patient?->phone,
+        'doctor'         => $invoice->doctor?->name,
+        'section'        => $invoice->doctor?->section?->name,
+        'service'        => $invoice->service?->name,
+        'price'          => $invoice->price,
+        'discount_value' => $invoice->discount_value,
+        'tax_rate'       => $invoice->tax_rate,
+        'tax_value'      => $invoice->tax_value,
+        'total_with_tax' => $invoice->total_with_tax,
+        'type'           => $invoice->type,
+        'type_label'     => $invoice->type_label,
+        'created_at'     => $invoice->created_at->format('Y-m-d H:i'),
+      ],
+      'print_count' => $invoice->printLogs()->count(),
     ]);
   }
 }

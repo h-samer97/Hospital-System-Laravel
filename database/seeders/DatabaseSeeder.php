@@ -33,10 +33,12 @@ class DatabaseSeeder extends Seeder
         ]);
 
 
-        User::factory()->create([
-            'name' => 'user',
-            'email' => 'user@example.com',
-            'password' => 'user'
-        ]);
+        User::firstOrCreate(
+            ['email' => 'user@example.com'],
+            [
+                'name' => 'user',
+                'password' => Hash::make('user'),
+            ]
+        );
     }
 }

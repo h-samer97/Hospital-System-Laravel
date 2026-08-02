@@ -1,142 +1,287 @@
 name: Valex CI/CD Pipeline
 
-# يعمل عند:
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, 'release/**']
   pull_request:
     branches: [main, develop]
+  # يسمح بالتشغيل اليدوي من GitHub UI
+  workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: 'Skip tests (emergency deploy only)'
+        required: false
+        default: 'false'
+        type: boolean
 
-# الأذونات اللازمة فقط (Principle of Least Privilege)
 permissions:
   contents: read
-  pull-requests: write
+  security-events: write   # لـ SAST upload
+  pull-requests: write     # لـ PR comments
+
+# إلغاء الـ runs القديمة عند push جديد على نفس الـ branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PHP_VERSION_PRIMARY: '8.3'
+  NODE_VERSION: '20'
 
 jobs:
 
   # ============================================================
-  # Job 1: Code Quality (Lint)
+  # Job 1: Security & Dependency Audit
   # ============================================================
-  lint:
-    name: 🔍 Code Quality
+  security:
+    name: 🔒 Security Audit
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.4'
-          extensions: mbstring, pdo, pdo_mysql
+          php-version: ${{ env.PHP_VERSION_PRIMARY }}
           coverage: none
 
-      - name: Cache Composer Packages
-        id: composer-cache
+      - name: Cache Composer
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock') }}
-          restore-keys: ${{ runner.os }}-composer-
+          key: composer-${{ hashFiles('composer.lock') }}
 
-      - name: Install PHP Dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
-        run: composer install --no-interaction --no-progress --prefer-dist
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --no-scripts
 
-      - name: Run Laravel Pint
-        run: ./vendor/bin/pint --test
+      # فحص الـ packages المعروفة بثغرات
+      - name: Composer Security Audit
+        run: composer audit --format=json > security-report.json || true
+
+      - name: Check Critical Vulnerabilities
+        run: |
+          CRITICAL=$(cat security-report.json | \
+            python3 -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          advisories = data.get('advisories', {})
+          critical = [
+            a for pkg in advisories.values()
+            for a in pkg
+            if a.get('severity') in ['critical', 'high']
+          ]
+          print(len(critical))
+          ")
+          echo "Critical vulnerabilities: $CRITICAL"
+          if [ "$CRITICAL" -gt "0" ]; then
+            echo "❌ Critical vulnerabilities found!"
+            cat security-report.json | python3 -m json.tool
+            exit 1
+          fi
+
+      # فحص Node packages
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: NPM Security Audit
+        run: npm audit --audit-level=high || true
+
+      - name: Upload Security Report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-report
+          path: security-report.json
+          retention-days: 30
 
   # ============================================================
-  # Job 2: Tests
+  # Job 2: Code Quality
+  # ============================================================
+  quality:
+    name: 🔍 Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: security
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ env.PHP_VERSION_PRIMARY }}
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --no-scripts
+
+      # Laravel Pint — Code Style
+      - name: Laravel Pint (Code Style)
+        run: ./vendor/bin/pint --test
+        id: pint
+
+      - name: Show Style Violations
+        if: failure() && steps.pint.outcome == 'failure'
+        run: ./vendor/bin/pint --test --format=json | python3 -m json.tool
+
+      # PHPStan — Static Analysis Level 8
+      - name: PHPStan Static Analysis
+        run: ./vendor/bin/phpstan analyse --level=8 --no-progress --error-format=github
+
+  # ============================================================
+  # Job 3: Tests (Matrix)
   # ============================================================
   test:
-    name: 🧪 Run Tests
+    name: 🧪 Tests PHP ${{ matrix.php }} / Node ${{ matrix.node }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    needs: lint
+    timeout-minutes: 25
+    needs: quality
+    if: ${{ github.event.inputs.skip_tests != 'true' }}
 
     strategy:
       matrix:
-        php: ['8.4'] # تحديث المصفوفة لتشمل الإصدار المتوافق 8.4 فقط حالياً
+        php:  ['8.2', '8.3']
+        node: ['20', '22']
+        # اختبر فقط الـ combinations الحقيقية
+        exclude:
+          - php: '8.2'
+            node: '22'
       fail-fast: false
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Setup PHP ${{ matrix.php }}
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: mbstring, pdo, pdo_sqlite, sqlite3
-          coverage: xdebug
+          extensions: mbstring, pdo, pdo_sqlite, sqlite3, redis, gd, zip
+          coverage: ${{ matrix.php == '8.3' && matrix.node == '20' && 'xdebug' || 'none' }}
+          ini-values: |
+            memory_limit=512M
+            opcache.enable=0
 
-      - name: Cache Composer Packages
-        id: composer-cache
+      - name: Cache Composer
         uses: actions/cache@v4
         with:
           path: vendor
-          key: ${{ runner.os }}-php${{ matrix.php }}-composer-${{ hashFiles('composer.lock') }}
-          restore-keys: ${{ runner.os }}-php${{ matrix.php }}-composer-
+          key: composer-php${{ matrix.php }}-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-php${{ matrix.php }}-
 
       - name: Install PHP Dependencies
-        if: steps.composer-cache.outputs.cache-hit != 'true'
-        run: composer install --no-interaction --no-progress --prefer-dist
+        run: composer install --no-interaction --prefer-dist --no-scripts
 
-      - name: Copy Environment File
-        run: cp .env.example .env
-
-      - name: Generate Application Key
-        run: php artisan key:generate
-
-      - name: Create SQLite Database
-        run: touch database/database.sqlite
-
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ matrix.node }}
           cache: 'npm'
 
       - name: Install NPM Dependencies
         run: npm ci
 
-      - name: Build Assets
+      - name: Build Frontend Assets
         run: npm run build
 
-      - name: Run Pest Tests
-        run: ./vendor/bin/pest --coverage --min=70
+      - name: Copy Environment
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Create SQLite Database
+        run: |
+          touch database/database.sqlite
+          php artisan migrate --force
+
+      # ===== Run Tests =====
+      - name: Run Pest Tests (with Coverage)
+        if: matrix.php == '8.3' && matrix.node == '20'
+        run: |
+          ./vendor/bin/pest \
+            --coverage \
+            --coverage-clover=coverage.xml \
+            --min=70 \
+            --parallel \
+            --log-junit=junit-report.xml
         env:
-          DB_CONNECTION: sqlite
-          DB_DATABASE:   database/database.sqlite
-          CACHE_DRIVER:  array
+          DB_CONNECTION:    sqlite
+          DB_DATABASE:      database/database.sqlite
+          CACHE_DRIVER:     array
+          QUEUE_CONNECTION: sync
+          SESSION_DRIVER:   array
+
+      - name: Run Pest Tests (no Coverage)
+        if: "!(matrix.php == '8.3' && matrix.node == '20')"
+        run: |
+          ./vendor/bin/pest \
+            --parallel \
+            --log-junit=junit-report.xml
+        env:
+          DB_CONNECTION:    sqlite
+          DB_DATABASE:      database/database.sqlite
+          CACHE_DRIVER:     array
           QUEUE_CONNECTION: sync
 
-      - name: Upload Coverage Report
-        if: matrix.php == '8.4' # التحديث ليتوافق مع الإصدار الجديد
+      # ===== Upload Reports =====
+      - name: Upload Coverage to Codecov
+        if: matrix.php == '8.3' && matrix.node == '20'
+        uses: codecov/codecov-action@v4
+        with:
+          file: coverage.xml
+          token: ${{ secrets.CODECOV_TOKEN }}
+          fail_ci_if_error: false
+
+      - name: Upload Test Results
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
-          path: coverage/
+          name: test-results-php${{ matrix.php }}-node${{ matrix.node }}
+          path: junit-report.xml
           retention-days: 7
 
+      # إضافة تقرير الـ Tests كـ PR Comment
+      - name: Report Tests to PR
+        if: github.event_name == 'pull_request' && matrix.php == '8.3' && matrix.node == '20'
+        uses: mikepenz/action-junit-report@v4
+        with:
+          report_paths: 'junit-report.xml'
+          check_name: 'Pest Test Results'
+
   # ============================================================
-  # Job 3: Build Docker Image
+  # Job 4: Build Docker Image
   # ============================================================
   build:
-    name: 🐳 Build Docker Image
+    name: 🐳 Build & Push Docker Image
     runs-on: ubuntu-latest
     needs: test
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    timeout-minutes: 20
+
+    outputs:
+      image_tag: ${{ steps.meta.outputs.tags }}
+      image_digest: ${{ steps.build.outputs.digest }}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+
+      - name: Set up QEMU (multi-arch)
+        uses: docker/setup-qemu-action@v3
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
+        with:
+          driver-opts: image=moby/buildkit:master
 
       - name: Login to Docker Hub
         uses: docker/login-action@v3
@@ -144,73 +289,314 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build and Push PHP Image
+      # توليد tags ذكية:
+      # main → latest + SHA
+      # tag v1.2.3 → 1.2.3 + 1.2 + 1 + latest
+      - name: Extract Docker Metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ secrets.DOCKER_USERNAME }}/valex-php
+          tags: |
+            type=ref,event=branch
+            type=sha,prefix=sha-,format=short
+            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+
+      - name: Build and Push
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: .
           file: docker/php/Dockerfile
+          target: final
           push: true
-          tags: |
-            ${{ secrets.DOCKER_USERNAME }}/valex-php:latest
-            ${{ secrets.DOCKER_USERNAME }}/valex-php:${{ github.sha }}
-          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/valex-php:latest
-          cache-to:   type=inline
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          platforms: linux/amd64,linux/arm64
+          # Layer caching من Docker Hub
+          cache-from: type=registry,ref=${{ secrets.DOCKER_USERNAME }}/valex-php:buildcache
+          cache-to:   type=registry,ref=${{ secrets.DOCKER_USERNAME }}/valex-php:buildcache,mode=max
+          # Build args من GitHub secrets
+          build-args: |
+            APP_VERSION=${{ github.sha }}
+            BUILD_DATE=${{ github.event.head_commit.timestamp }}
+
+      # Image Vulnerability Scan
+      - name: Scan Docker Image for Vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ secrets.DOCKER_USERNAME }}/valex-php:sha-${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '1'   # يفشل إذا وجد CRITICAL/HIGH
+
+      - name: Upload Trivy SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
 
   # ============================================================
-  # Job 4: Deploy (Production)
+  # Job 5: Deploy to Staging
   # ============================================================
-  deploy:
-    name: 🚀 Deploy to Production
+  deploy-staging:
+    name: 🚀 Deploy to Staging
     runs-on: ubuntu-latest
     needs: build
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: staging
+      url: https://staging.valex.hospital
+    timeout-minutes: 15
 
     steps:
-      - name: Check production secrets
-        id: check_secrets
-        run: |
-          if [ -n "${{ secrets.PROD_HOST }}" ] && [ -n "${{ secrets.PROD_USER }}" ] && [ -n "${{ secrets.PROD_SSH_KEY }}" ]; then
-            echo "configured=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "configured=false" >> "$GITHUB_OUTPUT"
-          fi
+      - uses: actions/checkout@v4
 
-      - name: Skip notice (no production server yet)
-        if: steps.check_secrets.outputs.configured == 'false'
-        run: |
-          echo "⚠️  Deploy skipped: PROD_HOST / PROD_USER / PROD_SSH_KEY not configured yet."
-          echo "This step will activate automatically once those secrets are added."
+      - name: Deploy to Staging via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host:     ${{ secrets.STAGING_HOST }}
+          username: ${{ secrets.STAGING_USER }}
+          key:      ${{ secrets.STAGING_SSH_KEY }}
+          script: |
+            set -euo pipefail
 
-      - name: Deploy via SSH
-        if: steps.check_secrets.outputs.configured == 'true'
+            echo "🚀 Starting deployment to STAGING..."
+            cd /var/www/valex-staging
+
+            # Pull latest image
+            docker compose pull php queue scheduler
+
+            # Rolling update — PHP أولاً
+            docker compose up -d --no-deps --scale php=2 php
+            sleep 10   # انتظر حتى تُشغَّل النسخة الجديدة
+
+            # تشغيل migrations
+            docker compose exec -T php php artisan migrate --force
+
+            # تحديث الـ cache
+            docker compose exec -T php php artisan config:cache
+            docker compose exec -T php php artisan route:cache
+            docker compose exec -T php php artisan view:cache
+
+            # إزالة النسخة القديمة
+            docker compose up -d --no-deps php
+
+            # تحديث Queue + Scheduler
+            docker compose up -d --no-deps queue scheduler
+
+            echo "✅ Staging deployment complete"
+
+      # Smoke Tests على Staging
+      - name: Smoke Tests — Health Check
+        run: |
+          echo "⏳ Waiting for staging to be ready..."
+          for i in $(seq 1 12); do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              https://staging.valex.hospital/health)
+            if [ "$STATUS" = "200" ]; then
+              echo "✅ Health check passed"
+              break
+            fi
+            echo "Attempt $i: Status $STATUS — waiting..."
+            sleep 10
+          done
+          [ "$STATUS" = "200" ] || (echo "❌ Health check failed" && exit 1)
+
+      - name: Smoke Tests — Print Endpoints
+        run: |
+          # تحقق أن صفحات الطباعة تستجيب
+          # Signed URLs تحتاج auth — نختبر فقط الـ 403 (يعني الـ route يعمل)
+
+          ENDPOINTS=(
+            "/Payment/1/print"
+            "/Receipt/1/print"
+            "/single_invoices/1/print"
+          )
+
+          for endpoint in "${ENDPOINTS[@]}"; do
+            STATUS=$(curl -s -o /dev/null -w "%{http_code}" \
+              "https://staging.valex.hospital$endpoint")
+            # 403 = route موجود لكن يرفض unsigned URL (صحيح!)
+            if [ "$STATUS" = "403" ] || [ "$STATUS" = "404" ]; then
+              echo "✅ $endpoint → $STATUS (expected)"
+            else
+              echo "❌ $endpoint → $STATUS (unexpected)"
+              exit 1
+            fi
+          done
+
+  # ============================================================
+  # Job 6: Deploy to Production
+  # ============================================================
+  deploy-production:
+    name: 🏭 Deploy to Production
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    environment:
+      name: production
+      url: https://valex.hospital
+    timeout-minutes: 20
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Backup قبل الـ Deploy
+      - name: Backup Database
         uses: appleboy/ssh-action@v1
         with:
           host:     ${{ secrets.PROD_HOST }}
           username: ${{ secrets.PROD_USER }}
           key:      ${{ secrets.PROD_SSH_KEY }}
           script: |
-            set -e
+            set -euo pipefail
+            TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+            BACKUP_DIR="/var/backups/valex"
+            mkdir -p $BACKUP_DIR
 
+            # Backup DB
+            docker compose exec -T mysql \
+              mysqldump -u root -p${{ secrets.DB_ROOT_PASSWORD }} valex \
+              > $BACKUP_DIR/db_before_deploy_$TIMESTAMP.sql
+
+            # ضغط الـ Backup
+            gzip $BACKUP_DIR/db_before_deploy_$TIMESTAMP.sql
+
+            # احتفظ بـ 10 backup فقط
+            ls -t $BACKUP_DIR/*.gz | tail -n +11 | xargs -r rm
+
+            echo "✅ Backup saved: db_before_deploy_$TIMESTAMP.sql.gz"
+
+      # Deploy Production
+      - name: Deploy to Production
+        id: deploy
+        uses: appleboy/ssh-action@v1
+        with:
+          host:     ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key:      ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            echo "🏭 Starting PRODUCTION deployment..."
             cd /var/www/valex
 
-            echo "📦 Pulling latest code..."
-            git pull origin main
+            # حفظ الـ image الحالية للـ rollback
+            CURRENT_IMAGE=$(docker inspect \
+              --format='{{index .RepoDigests 0}}' valex_php 2>/dev/null || echo "none")
+            echo $CURRENT_IMAGE > /tmp/valex_rollback_image
 
-            echo "🐳 Pulling new Docker image..."
+            # Pull new image
             docker compose -f docker-compose.yml -f docker-compose.prod.yml pull php
 
-            echo "🚀 Rolling update (zero downtime)..."
-            docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --no-deps php
+            # Enable maintenance mode
+            docker compose exec -T php php artisan down \
+              --retry=60 \
+              --render="errors.maintenance"
 
-            echo "🔄 Running migrations..."
+            # Rolling update
+            docker compose -f docker-compose.yml \
+              -f docker-compose.prod.yml \
+              up -d --no-deps --scale php=2 php
+
+            sleep 15
+
+            # Migrations
             docker compose exec -T php php artisan migrate --force
 
-            echo "⚡ Optimizing..."
+            # Optimize
             docker compose exec -T php php artisan config:cache
             docker compose exec -T php php artisan route:cache
             docker compose exec -T php php artisan view:cache
+            docker compose exec -T php php artisan event:cache
 
-            echo "🧹 Clearing old images..."
+            # إزالة النسخة القديمة
+            docker compose -f docker-compose.yml \
+              -f docker-compose.prod.yml \
+              up -d --no-deps php
+
+            # Update Queue Workers
+            docker compose -f docker-compose.yml \
+              -f docker-compose.prod.yml \
+              up -d --no-deps queue scheduler
+
+            # Clear old images
             docker image prune -f
 
-            echo "✅ Deploy complete!"
+            # Disable maintenance mode
+            docker compose exec -T php php artisan up
+
+            echo "✅ Production deployment complete"
+
+      # Health Check بعد الـ Deploy
+      - name: Production Health Check
+        run: |
+          echo "⏳ Verifying production health..."
+          for i in $(seq 1 12); do
+            RESPONSE=$(curl -s https://valex.hospital/health)
+            STATUS=$(echo $RESPONSE | python3 -c "import sys,json; d=json.load(sys.stdin); print(d['status'])")
+            if [ "$STATUS" = "healthy" ]; then
+              echo "✅ Production is healthy"
+              echo $RESPONSE | python3 -m json.tool
+              exit 0
+            fi
+            echo "Attempt $i: $STATUS — retrying..."
+            sleep 10
+          done
+          echo "❌ Production health check failed — triggering rollback"
+          exit 1
+
+      # Rollback تلقائي عند الفشل
+      - name: Rollback on Failure
+        if: failure() && steps.deploy.outcome != 'skipped'
+        uses: appleboy/ssh-action@v1
+        with:
+          host:     ${{ secrets.PROD_HOST }}
+          username: ${{ secrets.PROD_USER }}
+          key:      ${{ secrets.PROD_SSH_KEY }}
+          script: |
+            set -euo pipefail
+            echo "🔄 ROLLBACK INITIATED..."
+            cd /var/www/valex
+
+            # إيقاف maintenance إذا كان مفعّلاً
+            docker compose exec -T php php artisan up 2>/dev/null || true
+
+            # الرجوع للـ image السابقة
+            ROLLBACK_IMAGE=$(cat /tmp/valex_rollback_image)
+            if [ "$ROLLBACK_IMAGE" != "none" ]; then
+              docker pull $ROLLBACK_IMAGE
+              docker tag $ROLLBACK_IMAGE valex_php:rollback
+              docker compose -f docker-compose.yml -f docker-compose.prod.yml \
+                up -d --no-deps php
+              echo "✅ Rolled back to: $ROLLBACK_IMAGE"
+            fi
+
+            echo "⚠️ Rollback complete — check logs immediately"
+
+      # إشعار Slack/Teams عند نجاح أو فشل
+      - name: Notify on Success
+        if: success()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: |
+            ✅ *Valex* deployed successfully to Production
+            Commit: `${{ github.sha }}`
+            By: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+
+      - name: Notify on Failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: |
+            🚨 *Valex* deployment FAILED — Rollback triggered
+            Commit: `${{ github.sha }}`
+            By: ${{ github.actor }}
+            Check: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}

@@ -4,19 +4,19 @@
 namespace App\Repositories;
 
 use App\Http\Requests\StorePaymentRequest;
-use App\Interfaces\IPatients;
 use App\Interfaces\IPayment;
 use App\Models\Patients;
 use App\Models\PaymentAccount;
 use App\Services\PaymentService;
+use App\Services\PrintService;
 use App\Suppoet\BinarySearch;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
-use Override;
 
 class PaymentAccountRepository implements IPayment
 {
@@ -25,9 +25,11 @@ class PaymentAccountRepository implements IPayment
   private const PATIENTS_CACHE_TTL = 1800; // 30 minute
   private const PATIENTS_CACHE_KEY = 'patients:active:sorted';
 
-  public function __construct(private readonly PaymentService $payment_service) {}
+  public function __construct(
+    private readonly PaymentService $payment_service,
+    private readonly PrintService $print
+  ) {}
 
-  #[Override]
   public function index(): InertiaResponse
   {
 
@@ -46,6 +48,8 @@ class PaymentAccountRepository implements IPayment
         'urls'  => [
           'update' => route('payments.update', $pay->id),
           'destroy' => route('payments.destroy', $pay->id),
+          'print'    => $this->print->generateSigneURL($pay, 'payments.show'),
+          'download' => $this->print->generateSigneURL($pay, 'payments.download'),
         ]
       ]);
 
@@ -57,7 +61,6 @@ class PaymentAccountRepository implements IPayment
   }
 
 
-  #[Override]
   public function store(StorePaymentRequest $request): RedirectResponse
   {
     $this->payment_service->store(
@@ -70,7 +73,6 @@ class PaymentAccountRepository implements IPayment
     ]);
   }
 
-  #[Override]
   public function update(StorePaymentRequest $request, PaymentAccount $payment): RedirectResponse
   {
     $this->payment_service->update(
@@ -85,7 +87,6 @@ class PaymentAccountRepository implements IPayment
     ]);
   }
 
-  #[Override]
   public function destroy(PaymentAccount $payment): RedirectResponse
   {
     if (!Auth::guard('admins')->user()->can('payment.delete', $payment)) {
@@ -119,7 +120,46 @@ class PaymentAccountRepository implements IPayment
 
   private function findPatientByExactName(string $name): ?array
   {
-
     return BinarySearch::search($this->getCachedPatients(), $name, 'name');
+  }
+
+  public function show(PaymentAccount $payment): InertiaResponse
+  {
+    $payment->load('patient:id,name,phone,address');
+    $this->print->logPrint($payment, request(), 'view');
+
+    return Inertia::render('Payments/Print', [
+      'payment'     => [
+        'id'          => $payment->id,
+        'date'        => $payment->date->format('Y-m-d'),
+        'patient'     => $payment->patient?->name,
+        'phone'       => $payment->patient?->phone,
+        'address'     => $payment->patient?->address,
+        'amount'      => $payment->amount,
+        'description' => $payment->description,
+        'created_at'  => $payment->created_at->format('Y-m-d H:i'),
+      ],
+      'print_count' => $payment->printLogs()->count(),
+    ]);
+  }
+
+  public function download(PaymentAccount $payment): Response
+  {
+    $payment->load('patient:id,name,phone,address');
+    $this->print->logPrint($payment, request(), 'download');
+
+    return Inertia::render('Payments/Print', [
+      'payment' => [
+        'id'          => $payment->id,
+        'date'        => $payment->date->format('Y-m-d'),
+        'patient'     => $payment->patient?->name,
+        'phone'       => $payment->patient?->phone,
+        'address'     => $payment->patient?->address,
+        'amount'      => $payment->amount,
+        'description' => $payment->description,
+        'created_at'  => $payment->created_at->format('Y-m-d H:i'),
+      ],
+      'print_count' => $payment->printLogs()->count(),
+    ]);
   }
 }

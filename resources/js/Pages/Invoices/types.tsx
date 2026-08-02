@@ -29,6 +29,8 @@ export interface SingleInvoice {
   urls: {
     update: string;
     destroy: string;
+    print?:    string;
+    download?: string;
   };
 }
 

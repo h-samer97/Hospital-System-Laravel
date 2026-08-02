@@ -30,5 +30,11 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('payment.delete', function(Admin $admin, PaymentAccount $payment) {
             return $payment->created_at->diffInHours(now()) < 24;
         });
+        Gate::define('patients.view', function(Admin $admin) {
+            return true;
+        });
+        Gate::define('patients.viewFinancials', function(Admin $admin) {
+            return true;
+        });
     }
 }

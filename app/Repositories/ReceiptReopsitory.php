@@ -7,21 +7,21 @@ use App\Http\Requests\StoreReceiptRequest;
 use App\Interfaces\Finance\IReceipt;
 use App\Models\Patients;
 use App\Models\ReceiptAccount;
+use App\Services\PrintService;
 use App\Services\ReceiptService;
-use Illuminate\Http\RedirectResponse as HttpRedirectResponse;
+use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response as InertiaResponse;
-use Override;
-use Response;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class ReceiptReopsitory implements IReceipt
 {
 
 
-    public function __construct(private readonly ReceiptService $receipt_service) {}
+    public function __construct(
+        private readonly ReceiptService $receipt_service,
+        private readonly PrintService $print
+    ) {}
 
-    #[Override]
     public function index(): InertiaResponse
     {
         $receipt = ReceiptAccount::with('patient:id,name')
@@ -39,19 +39,20 @@ class ReceiptReopsitory implements IReceipt
                 'urls' => [
                     'update'  => route('receipt.update',  $r->id),
                     'destroy' => route('receipt.destroy', $r->id),
+                    'print'    => $this->print->generateSigneURL($r, 'payments.show'),
+                    'download' => $this->print->generateSigneURL($r, 'payments.download'),
                 ],
             ]);
         return Inertia::render('Receipts/Index', [
             'store_url' => route('receipt.store'),
             'receipts' => $receipt,
-            'patients' => Patients::where('is_active', '=', true, true)
+            'patients' => Patients::where('is_active', true)
                 ->select('id', 'name')
                 ->orderBy('name')
                 ->get(),
         ]);
     }
 
-    #[Override]
     public function store(StoreReceiptRequest $request): RedirectResponse
     {
 
@@ -62,7 +63,6 @@ class ReceiptReopsitory implements IReceipt
         ]);
     }
 
-    #[Override]
     public function update(StoreReceiptRequest $request, ReceiptAccount $receipt): RedirectResponse
     {
         $this->receipt_service->update($receipt, $request->validated());
@@ -71,6 +71,20 @@ class ReceiptReopsitory implements IReceipt
             'type'    => 'success',
             'message' => 'Receipt updated successfully',
         ]);
+    }
+
+    public function show(ReceiptAccount $receipt): RedirectResponse
+    {
+        return redirect()->away(
+            $this->print->generateSigneURL($receipt, 'payments.show')
+        );
+    }
+
+    public function download(ReceiptAccount $receipt): RedirectResponse
+    {
+        return redirect()->away(
+            $this->print->generateSigneURL($receipt, 'payments.download')
+        );
     }
 
     public function destroy(ReceiptAccount $receipt): RedirectResponse

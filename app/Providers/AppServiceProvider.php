@@ -3,6 +3,10 @@
 namespace App\Providers;
 
 use App\Interfaces\ISections;
+use App\Models\PaymentAccount;
+use App\Models\Receipt;
+use App\Models\SingleInvoices;
+use App\Observers\PatientFinancialObserver;
 use App\Repositories\SectionsRepositories;
 use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
@@ -28,6 +32,12 @@ class AppServiceProvider extends ServiceProvider
                 'message' => 'Too many requests [429]. Please wait.'
         ], 429));
     });
+
+    $observer = new PatientFinancialObserver();
+    SingleInvoices::observe($observer);
+    Receipt::observe($observer);
+    PaymentAccount::observe($observer);
+
 
     }
 }

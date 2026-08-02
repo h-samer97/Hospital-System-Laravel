@@ -12,10 +12,16 @@ use App\Models\Section;
 use App\Models\Service;
 use App\Models\FundAccounts;
 use App\Models\PatientAccounts;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Override;
+use Spatie\Activitylog\Models\Concerns\LogsActivity;
+use Spatie\Activitylog\Support\LogOptions;
 
 class SingleInvoices extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+
     protected $fillable = [
         'invoice_date',
         'patient_id',
@@ -66,7 +72,24 @@ class SingleInvoices extends Model
     {
         return $this->hasOne(PatientAccounts::class, 'single_invoice_id', 'id');
     }
-    public function getTypeLabelAttr(): string
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+        ->logOnly(['patient_id', 'doctor_id', 'service_id', 'total_with_tax', 'type'])
+        ->logOnlyDirty()
+        ->dontLogEmptyChanges()
+        ->useLogName('single_invoice');
+    }
+
+    public function printLogs() : MorphMany {
+        return $this->morphMany(PrintLog::class, 'printable');
+    }
+
+    public function getPrintCountAttribute() : int {
+        return $this->printLogs()->count();
+    }
+    
+    public function getTypeLabelAttribute(): string
     {
         return match ($this->type) {
             'cash'     => 'Cash',

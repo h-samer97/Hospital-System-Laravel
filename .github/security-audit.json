@@ -1,0 +1,7 @@
+{
+  "ignoreed":[],
+  "minimum-severity":"medium",
+  "exclude": [
+    "CVE-2023-XXXXX"
+  ]
+}

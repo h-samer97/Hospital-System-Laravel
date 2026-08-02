@@ -1,0 +1,51 @@
+version: 2
+
+updates:
+  # PHP Packages
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "Africa/Cairo"
+    # عدد PRs مفتوحة في نفس الوقت
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "php"
+    ignore:
+      # لا تحدّث major versions تلقائياً
+      - dependency-name: "laravel/framework"
+        update-types: ["version-update:semver-major"]
+
+  # Node Packages
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: "Africa/Cairo"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "javascript"
+
+  # Docker
+  - package-ecosystem: docker
+    directory: "/"
+    schedule:
+      interval: monthly
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # GitHub Actions
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    labels:
+      - "dependencies"
+      - "github-actions"

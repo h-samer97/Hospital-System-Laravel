@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Override;
 use Spatie\Activitylog\Models\Concerns\LogsActivity;
@@ -41,9 +42,14 @@ class PaymentAccount extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-        ->logFillable()
+        ->logOnly(['patient_id', 'amount', 'description'])
         ->logOnlyDirty()
-        ->dontLogEmptyChanges();
+        ->dontLogEmptyChanges()
+        ->useLogName('payment');
+    }
+
+    public function printLogs() : MorphMany {
+        return $this->morphMany(PrintLog::class, 'printable');
     }
 
 }

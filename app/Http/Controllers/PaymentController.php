@@ -6,8 +6,8 @@ use App\Http\Requests\StorePaymentRequest;
 use App\Interfaces\IPayment;
 use App\Models\PaymentAccount;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response as HttpResponse;
 use Inertia\Response;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 
@@ -36,5 +36,15 @@ class PaymentController extends Controller implements IPayment
   public function destroy(PaymentAccount $payment): RedirectResponse
   {
     return $this->paymentRepository->destroy($payment);
+  }
+
+  public function show(PaymentAccount $payment): Response
+  {
+    return $this->paymentRepository->show($payment);
+  }
+
+  public function download(PaymentAccount $payment): HttpResponse
+  {
+    return $this->paymentRepository->download($payment);
   }
 }

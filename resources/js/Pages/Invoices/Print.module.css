@@ -1,0 +1,85 @@
+/* Banner */
+.invoiceTypeBanner {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.5rem;
+}
+.badgeCash {
+  background: #d1fae5; color: #065f46;
+  padding: 0.35rem 1rem; border-radius: 99px;
+  font-size: 0.875rem; font-weight: 700;
+}
+.badgeDeferred {
+  background: #fef3c7; color: #92400e;
+  padding: 0.35rem 1rem; border-radius: 99px;
+  font-size: 0.875rem; font-weight: 700;
+}
+.invoiceDate { font-size: 0.875rem; color: #64748b; }
+
+/* Parties Grid */
+.partiesGrid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 1rem; margin-bottom: 1.75rem;
+}
+.partyBox {
+  background: #f8fafc; border-radius: 8px; padding: 1rem;
+}
+.partyTitle {
+  font-size: 0.8rem; font-weight: 700; color: #6366f1;
+  margin: 0 0 0.5rem; text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+/* Section */
+.section { margin-bottom: 1.75rem; }
+.sectionTitle {
+  font-size: 0.8rem; font-weight: 700; color: #94a3b8;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  margin: 0 0 0.75rem; padding-bottom: 0.4rem;
+  border-bottom: 2px solid #f1f5f9;
+}
+
+/* Service Table */
+.serviceTable {
+  width: 100%; border-collapse: collapse; font-size: 0.875rem;
+}
+.serviceTable th {
+  background: #f1f5f9; text-align: left;
+  padding: 0.6rem 0.85rem; font-weight: 600; color: #475569;
+  border-bottom: 2px solid #e2e8f0;
+}
+.serviceTable td {
+  padding: 0.75rem 0.85rem; border-bottom: 1px solid #f1f5f9;
+  color: #374151;
+}
+.numCell { text-align: right; font-family: 'Courier New', monospace; }
+
+/* Totals */
+.totalsSection { display: flex; justify-content: flex-end; }
+.totalsBox {
+  width: 320px; border: 1px solid #e2e8f0;
+  border-radius: 10px; overflow: hidden;
+}
+.totalRow {
+  display: flex; justify-content: space-between;
+  padding: 0.65rem 1rem; font-size: 0.9rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+.grandTotal {
+  background: #1e293b; color: #fff;
+  font-size: 1rem; font-weight: 800; border-bottom: none;
+}
+
+/* Invoice ID */
+.invoiceId {
+  text-align: center; margin-top: 1.5rem;
+  font-size: 0.85rem; color: #94a3b8;
+}
+.invoiceId code {
+  font-family: 'Courier New', monospace;
+  background: #f1f5f9; padding: 0.2rem 0.6rem;
+  border-radius: 4px; color: #475569; font-weight: 700;
+}
+
+@media print {
+  .partiesGrid { grid-template-columns: 1fr 1fr; }
+  .grandTotal  { background: #1e293b !important; -webkit-print-color-adjust: exact; }
+}

@@ -94,9 +94,62 @@ Route::middleware("auth:admins")->group(function () {
         ->group(function () {
             Route::resource('receipt', ReceiptAccountController::class)
                 ->only(['index', 'store', 'update', 'destroy']);
+
+            Route::get(
+                'single_invoices/{invoice}/print',
+                [SingleInvoicesController::class, 'show']
+            )
+                ->name('single_invoices.show')
+                ->middleware('signed');
+
+            Route::get(
+                'single_invoices/{invoice}/download',
+                [SingleInvoicesController::class, 'download']
+            )
+                ->name('single_invoices.download')
+                ->middleware('signed');
+
+            Route::get(
+                'Receipt/{receipt}/print',
+                [ReceiptAccountController::class, 'show']
+            )
+                ->name('Receipt.show')
+                ->middleware('signed');
+
+            Route::get(
+                'Receipt/{receipt}/download',
+                [ReceiptAccountController::class, 'download']
+            )
+                ->name('Receipt.download')
+                ->middleware('signed');
+
+
             Route::resource('payments', PaymentController::class)
                 ->only(['index', 'store', 'update', 'destroy']);
         });
     Route::resource('single_invoices', SingleInvoicesController::class)
         ->only(['index', 'store', 'update', 'destroy']);
+
+    Route::get(
+        'payments/{payment}/print',
+        [PaymentController::class, 'show']
+    )
+        ->name('Payment.show')
+        ->middleware('signed');
+
+    Route::get(
+        'Payment/{payment}/download',
+        [PaymentController::class, 'download']
+    )
+        ->name('Payment.download')
+        ->middleware('signed');
+
+    // Backwards-compatible lowercase route names expected by tests
+    Route::get('payments/{payment}/print', [PaymentController::class, 'show'])
+        ->name('payments.show')
+        ->middleware('signed');
+
+    Route::get('payments/{payment}/download', [PaymentController::class, 'download'])
+        ->name('payments.download')
+        ->middleware('signed');
 });

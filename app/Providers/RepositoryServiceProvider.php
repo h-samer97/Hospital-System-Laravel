@@ -23,7 +23,9 @@ use App\Repositories\ServiceRepository;
 use App\Repositories\SingleInvoiceRepository;
 use App\Repositories\ReceiptAccountRepository;
 use App\Services\InvoiceService;
+use App\Services\PatientService;
 use App\Services\PaymentService;
+use App\Services\PrintService;
 use App\Services\ReceiptService;
 use Illuminate\Support\ServiceProvider;
 
@@ -45,8 +47,9 @@ class RepositoryServiceProvider extends ServiceProvider
         $this->app->singleton(InvoiceService::class);
         $this->app->singleton(ReceiptService::class);
         $this->app->singleton(PaymentService::class);
+        $this->app->singleton(PrintService::class);
+        $this->app->singleton(PatientService::class);
         $this->app->bind(IPayment::class, PaymentAccountRepository::class);
-
         $this->app->bind(ISingleInvoice::class, SingleInvoiceRepository::class);
     }
 

@@ -6,6 +6,7 @@ use App\Http\Requests\StorePaymentRequest;
 use App\Models\PaymentAccount;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Response;
+use Illuminate\Http\Response as HttpResponse;
 
 interface IPayment
 {
@@ -13,5 +14,6 @@ interface IPayment
     public function store(StorePaymentRequest $request): RedirectResponse;
     public function update(StorePaymentRequest $request, PaymentAccount $payment): RedirectResponse;
     public function destroy(PaymentAccount $payment): RedirectResponse;
-    // private function getCachedPatients() : array;
+    public function show(PaymentAccount $payment): Response;
+    public function download(PaymentAccount $payment): HttpResponse;
 }
