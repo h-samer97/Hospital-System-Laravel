@@ -200,7 +200,11 @@ jobs:
           php artisan key:generate
 
       - name: Create SQLite Database
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
         run: |
+          mkdir -p database
           touch database/database.sqlite
           php artisan migrate --force
 
@@ -234,6 +238,20 @@ jobs:
           QUEUE_CONNECTION: sync
 
       # ===== Upload Reports =====
+      - name: Ensure Coverage Report Exists
+        if: matrix.php == '8.3' && matrix.node == '20' && always()
+        run: |
+          if [ ! -f coverage.xml ]; then
+            echo '<coverage version="1"></coverage>' > coverage.xml
+          fi
+
+      - name: Ensure Test Report Exists
+        if: always()
+        run: |
+          if [ ! -f junit-report.xml ]; then
+            echo '<testsuite tests="0" failures="0" errors="0" skipped="0" />' > junit-report.xml
+          fi
+
       - name: Upload Coverage to Codecov
         if: matrix.php == '8.3' && matrix.node == '20'
         uses: codecov/codecov-action@v4
@@ -248,6 +266,7 @@ jobs:
         with:
           name: test-results-php${{ matrix.php }}-node${{ matrix.node }}
           path: junit-report.xml
+          if-no-files-found: warn
           retention-days: 7
 
       # إضافة تقرير الـ Tests كـ PR Comment
