@@ -2,55 +2,42 @@
 # make up     بدل: docker compose up -d
 # make shell  بدل: docker compose exec php sh
 
-.PHONY: up down shell migrate seed fresh logs
+.PHONY: migrate seed fresh logs assets cache-clear setup
 
-# تشغيل كل الـ containers
-up:
-	docker compose up -d --build
-
-# إيقاف كل الـ containers
-down:
-	docker compose down
-
-# دخول shell داخل container الـ PHP
-shell:
-	docker compose exec php sh
-
-# تشغيل migrations
+# Local migrate (no Docker)
 migrate:
-	docker compose exec php php artisan migrate
+	php artisan migrate
 
-# تشغيل seeders
+# Local seeders
 seed:
-	docker compose exec php php artisan db:seed
+	php artisan db:seed
 
-# Reset كامل + migrate + seed
+# Reset + migrate + seed
 fresh:
-	docker compose exec php php artisan migrate:fresh --seed
+	php artisan migrate:fresh --seed
 
-# متابعة الـ logs
+# Tail logs locally (if file exists)
 logs:
-	docker compose logs -f
+	@test -f storage/logs/laravel.log && tail -f storage/logs/laravel.log || echo "No local log file found"
 
-# بناء assets
+# Build frontend assets
 assets:
-	docker compose exec php npm run build
+	npm run build
 
-# تنظيف الكاش
+# Clear caches locally
 cache-clear:
-	docker compose exec php php artisan cache:clear
-	docker compose exec php php artisan config:clear
-	docker compose exec php php artisan route:clear
-	docker compose exec php php artisan view:clear
+	php artisan cache:clear
+	php artisan config:clear
+	php artisan route:clear
+	php artisan view:clear
 
-# تهيئة المشروع من الصفر
+# Local setup (composer + npm)
 setup:
-	cp .env.docker .env
-	docker compose up -d --build
-	docker compose exec php composer install
-	docker compose exec php php artisan key:generate
-	docker compose exec php php artisan storage:link
-	docker compose exec php php artisan migrate --seed
-	docker compose exec php npm install
-	docker compose exec php npm run build
-	@echo "✅ Valex is ready at https://localhost"
+	cp .env.example .env
+	composer install
+	php artisan key:generate
+	php artisan storage:link
+	php artisan migrate --seed
+	npm ci
+	npm run build
+	@echo "✅ Local setup complete"
