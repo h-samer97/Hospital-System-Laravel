@@ -1,7 +1,7 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 import PrintLayout from '@/Layouts/PrintLayout';
-import InfoRow from '@/Components/Print/InfoRow';
+import InfoRow from '@/Components/InfoRow';
 import type { PrintableReceipt } from '@/types/models';
 import styles from './Print.module.css';
 

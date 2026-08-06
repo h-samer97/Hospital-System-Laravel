@@ -138,7 +138,7 @@ Route::middleware("auth:admins")->group(function () {
         ->middleware('signed');
 
     Route::get(
-        'Payment/{payment}/download',
+        'payments/{payment}/download',
         [PaymentController::class, 'download']
     )
         ->name('Payment.download')

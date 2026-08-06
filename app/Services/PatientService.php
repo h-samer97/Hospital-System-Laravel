@@ -91,14 +91,15 @@ class PatientService
 
                     return [
                         'id' => $PA->id,
-                        'date' => $PA->date->date_format('Y-m-d'),
+                        'date' => $PA->date->format('Y-n-j'),
                         'description' => $description,
                         'type' => $entryType,
                         'debit' => \round((float) $PA->debit, 2),
                         'credit' => round((float) $PA->credit, 2),
-                        'running_balance' => \round((float) $runningBalance, 2)
+                        'running_balance' => \round((float) $runningBalance, 2),
+                        'is_debtor' => $runningBalance > 0 ? true : false,
                     ];
-                });
+                })->toArray();
             }
         );
     }

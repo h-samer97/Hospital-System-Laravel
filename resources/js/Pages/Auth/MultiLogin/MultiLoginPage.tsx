@@ -3,23 +3,18 @@ import { RoleKey } from "./types";
 import MultiLoginForm from "./MultiLoginForm";
 import React, { useState } from "react";
 const ROLES: Record<RoleKey, RoleConfig> = {
-  user:                  { label: "الدخول كمريض",       action: "/login/user",   icon: "user" },
-  admin:                 { label: "الدخول كمشرف",       action: "/login/admin",  icon: "shield" },
-  doctor:                { label: "الدخول كدكتور",       action: "/login/doctor", icon: "stethoscope" },
-  ray_employee:          { label: "موظف أشعة",           action: "/login/ray",    icon: "x-ray" },
-  pharmacy_employee:      { label: "موظف صيدلية",        action: "/login/pharmacy", icon: "pills" },
-  laboratorie_employee:  { label: "موظف مختبر",          action: "/login/lab",    icon: "flask" },
+  admin: { label: "الدخول كمشرف", action: "/login/admin", icon: "shield" },
 };
 
-const MultiLoginPage : React.FC = () => {
+const MultiLoginPage: React.FC = () => {
 
-    const [selectedRole, setSelectedRole] = useState<RoleKey | null>(null);
+  const [selectedRole, setSelectedRole] = useState<RoleKey | null>(null);
 
-    const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setSelectedRole(e.target.value as RoleKey);
-    }
+  const handleRoleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedRole(e.target.value as RoleKey);
+  }
 
-     return (
+  return (
     <div className="min-h-screen flex">
       {/* ===== الجانب الأيسر: صورة ===== */}
       <div className="hidden md:flex md:w-1/2 bg-blue-100 items-center justify-center">

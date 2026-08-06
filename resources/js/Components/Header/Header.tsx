@@ -1,5 +1,6 @@
 import { usePage } from '@inertiajs/react';
 import styles from './Header.module.css';
+import { List } from 'lucide-react';
 
 interface HeaderProps {
     title: string;
@@ -20,7 +21,7 @@ export default function Header({ title, userType, links, onToggleSidebar }: Head
             <div className={styles.headerRight}>
                 {onToggleSidebar && (
                     <button className={styles.toggleBtn} onClick={onToggleSidebar} aria-label="Toggle menu">
-                        ☰
+                        <List />
                     </button>
                 )}
                 <h1 className={styles.headerTitle}>{title}</h1>

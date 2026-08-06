@@ -8,11 +8,12 @@ interface Patient {
     gender: 'male' | 'female';
     gender_label: string;
     blood_group: BloodGroup['typeBlood'];
-    address: string;
+    address: string | null;
     is_active?: boolean;
     urls: {
         update: string;
         destroy: string;
+        show: string;
     };
     created_at?: string;
     updated_at?: string;

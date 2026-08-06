@@ -12,7 +12,7 @@ class AdminSeeder extends Seeder
     public function run(): void
     {
 
-        DB::table('admins')->truncate();
+        DB::table('admins')->delete();
 
         Admin::create([
             'name'     => 'root',

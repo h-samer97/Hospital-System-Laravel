@@ -1,58 +1,113 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# نظام إدارة مستشفى
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+نظام ويب متكامل لإدارة العمليات المرضية والمالية داخل مستشفى، مبني على Laravel 13 وReact عبر Inertia.
 
-## About Laravel
+## نظرة عامة
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+هذا المشروع يوفّر لوحة إدارة خلفية متكاملة لدور الأدمن  داخل المستشفى:
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+ويشمل إدارة المرضى، الأقسام، الأطباء، الخدمات، المجموعات، شركات التأمين، سيارات الإسعاف، الفواتير، المدفوعات، والإيصالات.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## الميزات الرئيسية
 
-## Learning Laravel
+- لوحة إدارة خاصة بالمسؤول
+- إدارة الأقسام وبيانات الأطباء
+- إدارة الخدمات الطبية والمجموعات الطبية
+- إدارة شركات التأمين وحسابات المرضى
+- إدارة المرضى وعرض التفاصيل
+- إدارة سيارات الإسعاف
+- نظام الفواتير الفردية (Single Invoices)
+- نظام الحسابات المالية والإيصالات
+- نظام المدفوعات
+- طباعة وتنزيل الإيصالات والفواتير والمدفوعات باستخدام روابط موقعة
+- فحص الحالة الصحية للنظام (health check)
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+## التقنيات المستخدمة
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Laravel 13
+- PHP 8.3
+- Inertia.js + React
+- Tailwind CSS
+- Vite
+- DOMPDF للطباعة وإنشاء ملفات PDF
+- Sentry للرصد والتتبع
+- Spatie Activitylog لتسجيل النشاطات
+- Sanctum للمصادقة إن لزم الأمر
+- Ziggy لتوليد مسارات Laravel في الواجهة الأمامية
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+## بنية النظام
 
-## Agentic Development
+- `routes/web.php` - مسارات عامة وفحص الصحة
+- `routes/backend.php` - مسارات إدارة النظام والكيانات الأساسية
+- `app/Http/Controllers/` - تحكم الواجهة الخلفية
+- `app/Models/` - نماذج البيانات مثل المرضى، الأطباء، الفواتير، الإيصالات
+- `resources/js/` - واجهة React باستخدام Inertia
+- `resources/css/` - أنماط Tailwind
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## المتطلبات الأساسية
+
+- PHP 8.3
+- Composer
+- Node.js و npm
+- قاعدة بيانات مدعومة من Laravel
+- Redis (لإختبار حالة الصحة إذا تم تفعيل التخزين المؤقت)
+
+## التثبيت والتشغيل
+
+1. تثبيت الاعتمادات عبر Composer:
 
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+composer install
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+2. نسخ ملف البيئة وتهيئته:
 
-## Contributing
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. إعداد قاعدة البيانات وتشغيل الهجرات:
 
-## Code of Conduct
+```bash
+php artisan migrate
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. تثبيت حزمة npm والبناء:
 
-## Security Vulnerabilities
+```bash
+npm install
+npm run build
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. تشغيل الخادم المحلي:
 
-## License
+```bash
+php artisan serve
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+6. لتشغيل بيئة التطوير مع Vite وقائمة الانتظار:
+
+```bash
+npm run dev
+```
+
+## أوامر مفيدة
+
+- `composer test` - تشغيل اختبارات Pest
+- `composer lint` - فحص تنسيق الكود عبر Laravel Pint
+- `composer analyse` - فحص أنواع PHP عبر PHPStan
+- `npm run build` - بناء الواجهة الأمامية
+- `npm run dev` - تشغيل واجهة التطوير
+
+## ملاحظات
+
+- يعتمد المشروع على الرابط الموقّع `signed` لطباعة وتنزيل المستندات بصورة آمنة.
+- `routes/backend.php` يحتوي على الموارد الأساسية لإدارة المرضى، الأطباء، التأمين، المدفوعات، والإيصالات.
+- يمكن تخصيص الصلاحيات بشكل أوسع عبر وسيط `auth:admins` للعمليات المالية والإدارية.
+
+---
+
+## مراجع
+
+هذا المستودع مبني على هيكل Laravel قياسي ويستخدم خصائص Inertia لتطبيق واجهة تفاعلية مبنية على React.

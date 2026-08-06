@@ -111,40 +111,6 @@ export default function ReceiptsIndex({ receipts, patients, store_url }: Props) 
                           🗑️
                         </button>
                       </td>
-                      // في الجدول — عمود Actions
-<td>
-  <div className={styles.actions}>
-
-    {/* Edit */}
-    <button className={styles.editBtn}
-      onClick={() => setModal({ mode: 'edit', payment })}
-      title="Edit">✏️</button>
-
-    {/* ✅ Print — يفتح صفحة الطباعة في نافذة جديدة */}
-    
-      href={payment.urls.print}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.printBtn}
-      title="Print"
-    >🖨️</a>
-
-    {/* ✅ Download PDF */}
-    
-      href={payment.urls.download}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={styles.downloadBtn}
-      title="Download PDF"
-    >⬇️</a>
-
-    {/* Delete */}
-    <button className={styles.deleteBtn}
-      onClick={() => setDeletePayment(payment)}
-      title="Delete">🗑️</button>
-
-  </div>
-</td>
                     </tr>
                   ))
                 )}

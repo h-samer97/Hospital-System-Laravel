@@ -11,7 +11,7 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => {
-        const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+        const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
         const path = name.split('.').map(capitalize).join('/');
         return resolvePageComponent(
             `./Pages/${path}.tsx`,

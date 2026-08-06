@@ -130,7 +130,7 @@ const InvoiceForm = ({ mode, invoice, patients, doctors, services, store_url, on
             <div className={styles.row4}>
               <div className={styles.formGroup}>
                 <label>Patient</label>
-                <select className={styles.input} value={data.patient_id ?? ''} onChange={(e) => setData('patient_id', e.target.value)}>
+                <select className={styles.input} value={data.patient_id ?? ''} onChange={(e) => setData('patient_id', e.target.value === '' ? '' : Number(e.target.value))}>
                   <option value="">-- Select Patient --</option>
                   {patients.map(p => (
                     <option key={p.id} value={p.id}>{p.name}</option>
@@ -143,7 +143,7 @@ const InvoiceForm = ({ mode, invoice, patients, doctors, services, store_url, on
 
               <div className={styles.formGroup}>
                 <label>Doctor</label>
-                <select className={styles.input} value={data.doctor_id ?? ''} onChange={(e) => setData('doctor_id', e.target.value)}>
+                <select className={styles.input} value={data.doctor_id ?? ''} onChange={(e) => setData('doctor_id', e.target.value === '' ? '' : Number(e.target.value))}>
                   <option value="">-- Select Doctor --</option>
                   {doctors.map(d => (
                     <option key={d.id} value={d.id}>{d.name}</option>
@@ -196,7 +196,7 @@ const InvoiceForm = ({ mode, invoice, patients, doctors, services, store_url, on
 
                     {/* Service Selection */}
                     <td>
-                      <select className={styles.input} value={data.service_id ?? ''} onChange={(e) => setData('service_id', e.target.value)}>
+                      <select className={styles.input} value={data.service_id ?? ''} onChange={(e) => setData('service_id', e.target.value === '' ? '' : Number(e.target.value))}>
                         <option value="">-- Select Service --</option>
                         {services.map(s => (
                           <option key={s.id} value={s.id}>{s.name} ({s.price})</option>
@@ -221,7 +221,7 @@ const InvoiceForm = ({ mode, invoice, patients, doctors, services, store_url, on
                         className={styles.input}
                         min="0"
                         value={data.discount_value ?? 0}
-                        onChange={(e) => setData('discount_value', e.target.value)}
+                        onChange={(e) => setData('discount_value', Number(e.target.value))}
                       />
                     </td>
 
@@ -233,7 +233,7 @@ const InvoiceForm = ({ mode, invoice, patients, doctors, services, store_url, on
                         min="0"
                         max="100"
                         value={data.tax_rate ?? 0}
-                        onChange={(e) => setData('tax_rate', e.target.value)}
+                        onChange={(e) => setData('tax_rate', Number(e.target.value))}
                       />
                     </td>
 

@@ -1,15 +1,15 @@
 import React from 'react';
 import { Head } from '@inertiajs/react';
 import PrintLayout from '@/Layouts/PrintLayout';
-import InfoRow from '@/Components/Print/InfoRow';
+import InfoRow from '@/Components/InfoRow';
 import type { PrintableInvoice } from '@/types/models';
 import styles from './Print.module.css';
 
 interface Props {
-  invoice:     PrintableInvoice;
+  invoice: PrintableInvoice;
   print_count: number;
   urls?: {
-    print:    string;
+    print: string;
     download: string;
   };
 }
@@ -46,14 +46,14 @@ export default function InvoicePrint({ invoice, print_count, urls }: Props) {
           {/* المريض */}
           <section className={styles.partyBox}>
             <h3 className={styles.partyTitle}>👤 Patient</h3>
-            <InfoRow label="Name"    value={invoice.patient} />
-            <InfoRow label="Phone"   value={invoice.phone} />
+            <InfoRow label="Name" value={invoice.patient} />
+            <InfoRow label="Phone" value={invoice.phone} />
           </section>
 
           {/* الطبيب والقسم */}
           <section className={styles.partyBox}>
             <h3 className={styles.partyTitle}>👨‍⚕️ Doctor</h3>
-            <InfoRow label="Name"    value={invoice.doctor} />
+            <InfoRow label="Name" value={invoice.doctor} />
             <InfoRow label="Section" value={invoice.section} />
           </section>
 

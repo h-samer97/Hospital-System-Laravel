@@ -16,7 +16,7 @@ class GroupsRepository implements IGroups
     public function index(): Response
     {
         $groups = Group::with('services')
-            ->select('id','name','notes','subtotal','discount','tax_percent','total','is_active','created_at')
+            ->select('id', 'name', 'notes', 'subtotal', 'discount', 'tax_percent', 'total', 'is_active', 'created_at')
             ->latest()
             ->get()
             ->map(fn(Group $g) => [
@@ -40,7 +40,7 @@ class GroupsRepository implements IGroups
             ]);
 
         // كل الخدمات المتاحة للاختيار في الفورم
-        $services = Service::where('is_active', '=', true, true)
+        $services = Service::where('is_active', true)
             ->select('id', 'name', 'price')
             ->get();
 
@@ -113,5 +113,4 @@ class GroupsRepository implements IGroups
             'message' => 'Group deleted successfully',
         ]);
     }
-
 }

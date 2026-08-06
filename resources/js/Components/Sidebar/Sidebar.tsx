@@ -3,13 +3,16 @@ import styles from './Sidebar.module.css';
 import { Home, Users, Calendar, Building2, Beaker, Pill, Settings, LogOut, Stethoscope } from 'lucide-react';
 
 const staticNavItems = [
-    { label: 'Dashboard', icon: Home, href: '/dashboard/admin' },
-    { label: 'Doctors', icon: Stethoscope, href: '/doctors' },
-    { label: 'Patients', icon: Users, href: '/patients' },
-    { label: 'Services', icon: Beaker, href: '/services' },
-    { label: 'Groups', icon: Building2, href: '/groups' },
-    { label: 'Insurances', icon: Pill, href: '/insurances' },
-    { label: 'Ambulances', icon: Building2, href: '/ambulances' },
+    { label: 'الرئيسية', icon: Home, href: '/dashboard/admin' },
+    { label: 'الأطباء', icon: Stethoscope, href: '/doctors' },
+    { label: 'المرضى', icon: Users, href: '/patients' },
+    { label: 'الخدمات', icon: Beaker, href: '/services' },
+    { label: 'المجموعات', icon: Building2, href: '/groups' },
+    { label: 'شركات التأمين', icon: Pill, href: '/insurances' },
+    { label: 'الإسعاف', icon: Building2, href: '/ambulances' },
+    { label: 'المدفوعات', icon: Home, href: '/payments' },
+    { label: 'حسابات الصندوق', icon: Home, href: '/receipt' },
+    { label: 'الفواتير', icon: Home, href: '/single_invoices' },
 ];
 
 export default function Sidebar({ isOpen }: { isOpen: boolean }) {
